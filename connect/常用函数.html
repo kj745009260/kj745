@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <title>Document</title>
+   <style type="text/css">
+      *{ margin:0; padding: 0; }
+      .container { padding: 20px 40px; }
+      .ele { margin: 30px 60px; }
+   </style>
+</head>
+<body>
+<p></p><p></p>
+   <img src="img/3333.jpg" style="display:none" />
+   <canvas id="canvas" width="400" height="300"></canvas>
+</body>
+</html>
+<script src="http://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript">
+</script>
+
+<script>
+//动态加载js文件
+function loadScript(src){
+   var script = document.createElement('script');
+   script.type = 'text/javascript';
+   script.src = src;
+   document.body.appendChild(script);
+}
+
+//offset相关
+//1.offsetHeight:元素在垂直方向上占用的空间大小，以像素记。包括元素的高度、(可见的)水平滚动条的高度、上下边框高度
+//2.offsetWidth :元素在水平方向上占用的空间大小，以像素记。包括元素的宽度、(可见的)水平滚动条的宽度、左右边框宽度
+//3.offsetLeft  :元素的左外边框至包含元素的左内边框之间的像素距离
+//4.offsetTop   :元素的上外边框至包含元素的上内边框之间的像素距离
+
+//获取元素在页面上的偏移量
+function getElementOffset(element,direction){  //[element,[Left || Top]]
+   var elementOffset = element['offset'+direction];
+   var parentElement = element.offsetParent;
+   while(parentElement !== null){
+       elementOffset += parentElement['offset'+direction];
+       parentElement = parentElement.offsetParent;
+   }
+   return elementOffset;
+}
+
+//获取浏览器视口大小
+function getViewport(){
+   if(document.compatMode == 'BackCompat'){  //IE7之前
+      return {
+         width:document.body.clientWidth,
+         height: document.body.clientHeight
+      }
+   }else{
+      return {
+         width: document.documentElement.clientWidth,
+         height: document.documentElement.clientHeight
+      }
+   }
+}
+
+//事件处理
+var eventUtil = {
+   addHandler: function(element, type, handler){
+       if(element.addEventListener){      //DOM2级
+          element.addEventListener(type, handler, false);
+       }else if(element.attachEvent){     //IE8以前，ie下this的作用域指向window
+          element.attachEvent('on'+type, hanler);
+       }else{                             //DOM0级
+          element['on'+type] = handler;
+       }
+   },
+   removeHandler: function(element, type, handler){
+       if(element.removeEventListener){
+          element.removeEventListener(type, handler, false);
+       }else if(element.detachEvent){
+          element.detachEvent('on'+type, handler);
+       }else{
+          element['on'+type] = null;
+       }
+   }
+}
+</script>
+

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html class="js-no-overflow-scrolling">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="cache-control" content="max-age=0" />
+<meta http-equiv="cache-control" content="no-cache" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>test1</title>
+<link rel="stylesheet" type="text/css" href="H5FullscreenPage.css">
+<link rel="stylesheet" type="text/css" href="page-animation.css">
+<style type="text/css">
+    html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        font-family: arial;
+        text-align: center;
+    }
+    
+    * {
+        margin:0;
+        padding: 0;
+    }
+    ul {
+        list-style: none;
+    }
+    
+    .item2 {
+        background-color: #0067A6;
+    }
+    .item1 {
+        background-color: #00ABD8;
+    }
+</style>
+
+</head>
+<body class="H5FullscreenPage">
+    <div class="H5FullscreenPage-wrap">
+        <div class="item item1">
+        </div>
+        <div class="item item2">
+        </div>
+    </div>
+    <script src="http://cdn.bootcss.com/zepto/1.0rc1/zepto.min.js"></script>
+    <script type="text/javascript" src="H5FullscreenPage.js"></script>
+    <script type="text/javascript">
+    
+    H5FullscreenPage.init({'type':2,'pageShow' : function(dom){
+        
+    },'pageHide' : function(dom){
+        //console.log(dom);
+    }});
+    
+    </script>
+</body>
+</html>

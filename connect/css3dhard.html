@@ -1,0 +1,321 @@
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="user-scalable=no" />
+        <title>Document</title>
+        <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js"></script>
+        <style>
+            html{
+                height: 600px;
+            }
+            body{
+                -moz-user-select: none;/*禁止页面左键选择内容 兼容火狐*/
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #000;
+                perspective:800px;
+                overflow: hidden;
+                margin-top: -16px;
+            }
+            .wall{
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+
+
+            #main{
+                width: 0px;
+                height: 0px;
+                position: relative;
+                top: 50%;
+                left: 50%;
+                transform-style: preserve-3d;
+                transform:translateZ(-5000px);
+                z-index: 20;
+
+            }
+            #main li{
+                list-style: none;
+                width: 160px;
+                height: 200px;
+                position: absolute;
+                top: 0;
+                left: 0;
+                text-align: center;
+                color: #FFF;
+                font-weight: bold;
+                font-size: 40px;
+                line-height: 40px;
+                margin-left: -50px;
+                margin-top: -100px;
+                background:rgba(0,127,200,0.8);
+                border: 1px solid rgba(100,255,255,0.25);
+                box-shadow: 0 0 12px rgba(0,255,255,0.5);
+                transition:all 3s ease-in-out;
+                -webkit-transition:all 3s ease-in-out;
+                -moz-transition:all 3s ease-in-out;
+                -o-transition:all 3s ease-in-out;
+            }
+            #main li p{
+                line-height: 40px;
+                color: #FFF;
+                font-weight: bold;
+            }
+            #main li:hover{
+                box-shadow: 0 0 12px rgba(0,255,255,0.75);
+                border: 1px solid rgba(127,255,255,0.75);
+            }
+            span{
+                position: absolute;
+                z-index: 30;
+                display: block;
+                width: 200px;
+                height: 100px;
+                color: #fff;
+                font-size: 20px;
+                font-weight: bold;
+                line-height: 100px;
+                cursor: pointer;
+            }
+            span:nth-child(1){
+                left: 10%;
+            }
+            span:nth-child(2){
+                left: 20%;
+            }
+            span:nth-child(3){
+                left: 30%;
+            }
+        </style>
+
+    </head>
+<body onselectstart="return false"><!--禁止页面左键选择内容   兼容IE、Chrome-->
+
+<!-- 切换层 -->
+
+<span class="qiu">球形</span>
+<span class="wangge">网格</span>
+<span class="luoxuan">螺旋</span>
+<p style="z-index:999">点击切换</p>
+
+
+
+<!-- 表现层 -->
+<ul id="main" onselectstart="return false">
+</ul>
+<script>
+    $(function(){
+
+        var mouseValue = {};
+        mouseValue.nowX;    //鼠标移动的时候获得当前页面X轴坐标
+        mouseValue.nowY;    //鼠标移动的时候获得当前页面Y轴坐标
+        mouseValue.lastX;   //每次提起鼠标获得当前页面X轴坐标
+        mouseValue.lastY;   //每次提前鼠标获得当前页面Y轴坐标
+        mouseValue.minusX=0;    //两次X轴坐标差
+        mouseValue.minusY=0;    //两次Y轴坐标差
+        mouseValue.roY=0;       //Y轴的rotate()偏移量
+        mouseValue.roX=0;       //X轴的rotate()偏移量
+        mouseValue.trZ=-2000;   //Z轴的translate()偏移量
+        mouseValue.timer1;      //定时器
+        mouseValue.timer2;      //定时器
+
+        var value ={}   //坐标对象
+        value.liNum = 175;  //li个数
+        value.tX =400;      //li之间在X轴的间距
+        value.tY=300;       //li之间在Y轴的间距
+        value.tZ=600;       //li之间在Z轴的间距
+        value.firstX =-2*value.tX;      //(第一个li水平平移量)每层五个，第一个相对于ul处于左上角，在X轴上也就是两倍的tX
+        value.firstY =-2*value.tY;      //(第一个li垂直平移量)每层五个，第一个相对于ul处于左上角，在Y轴上也就是两倍的tY
+        value.firstZ =-2*value.tZ;      //(第一个li Z轴平移量)每层五个，第一层相对于ul处于前方两层处，在Z轴上也就是两倍的tY
+
+
+
+
+        (function(){
+            for (var i = 0; i<value.liNum; i++) {//遍历并生成li
+
+                // 页面渲染完的原始布局
+                var x =(Math.random()-0.5)*5000;
+                var y =(Math.random()-0.5)*5000;
+                var z =(Math.random()-0.5)*5000;
+                var $li = $("<li>HTML5<p>&</p><p>Css3</p></li>");
+
+                $li.css({
+                    "transform" : "translate3d("+ x +"px," + y +"px," + z +"px)"
+                });
+                $("#main").append($li);
+            }
+            setTimeout(function(){
+                init();
+            },500);
+        })()
+
+
+
+        // 滚轮拖动、缩放
+        /*$("body").mousedown(function(ev){
+
+            clearInterval(mouseValue.timer1);   //鼠标再次点击的时候先把上一次拖动结束后缓冲的放大或者缩小事件开启的定时器关闭（针对多次快速点击）
+            ev = ev || window.event;        //捕捉事件源
+            mouseValue.lastX = ev.clientX;  //获取当前X轴坐标，因为页面刚渲染完的第一次点击只有nowX没有lsatX。所以这里页面渲染完点击后直接先把lastX= ev.clientX;
+            mouseValue.lastY = ev.clientY;  //获取当前Y轴坐标，因为页面刚渲染完的第一次点击只有nowX没有lsatY。所以这里页面渲染完点击后直接先把lastY= ev.clientY;
+
+            $(this).on("mousemove",function(ev){
+
+                ev = ev || window.event;
+                mouseValue.nowX = ev.clientX;   //获取鼠标移动的时候的当前X轴坐标
+                mouseValue.nowY = ev.clientY;   //获取鼠标移动的时候的当前Y轴坐标
+                mouseValue.minusX = mouseValue.nowX - mouseValue.lastX;
+                mouseValue.minusY = mouseValue.nowY - mouseValue.lastY;
+                mouseValue.roY += mouseValue.minusX * 0.2;  //由于差值直接转换为rotate的deg单位，导致单位量过大，页面效果不友好。所以这里使用其本身的0.2倍。
+                mouseValue.roX -= mouseValue.minusY * 0.2;
+                $("#main").css({
+                    "transform":"translateZ(" + mouseValue.trZ + "px) rotateY(" + mouseValue.roY+"deg) rotateX(" + mouseValue.roX+"deg)"
+                });
+
+                mouseValue.lastX = mouseValue.nowX; //把鼠标移动结束后的当前X坐标赋给lastX,(可以去掉此行代码尝试一下效果)在接下来页面的继续拖拽过程中，此值作为起始坐标值，这样可以避免每次重新点击页面会出现Ｘ轴恢复原始位置，而不是连贯的或者缓慢的拖拽效果。
+                mouseValue.lastY = mouseValue.nowY; //把鼠标移动结束后的当前X坐标赋给lastＹ,在接下来页面的继续拖拽过程中，此值作为起始坐标值，这样可以避免每次重新点击页面会出现Ｙ轴恢复原始位置，而不是连贯的或者缓慢拖拽效果。
+            });
+        }).mouseup(function(){
+            $(this).off("mousemove");//去除事件
+
+            // 拖拽动画缓冲效果，开启定时器
+            mouseValue.timer1=setInterval(function(){
+                mouseValue.minusX =mouseValue.minusX*0.9;
+                mouseValue.minusY =mouseValue.minusY*0.9;
+                mouseValue.roY += mouseValue.minusX * 0.2;
+                mouseValue.roX -= mouseValue.minusY * 0.2;
+
+                if (Math.abs(mouseValue.minusX)<0.5&&Math.abs(mouseValue.minusY)<0.5) { //获取mouseValue.minusX的绝对值，如果小于0.5清楚定时器，以免缓冲动画完成但是定时器还在跑。
+                    clearInterval(mouseValue.timer1);
+                }
+                $("#main").css({
+                    "transform":"translateZ(" + mouseValue.trZ + "px) rotateY(" + mouseValue.roY+"deg) rotateX(" + mouseValue.roX+"deg)"
+                });
+            },20);
+
+        }).mousewheel(function(e,d){
+            // 缩放
+            // var dire = arguments[1];
+            clearInterval(mouseValue.timer1)
+            mouseValue.trZ +=d*40;
+            mouseValue.trZ =Math.min(1500,mouseValue.trZ);  //获取变化中的最小值，最近的视窗为1500
+
+            mouseValue.trZ =Math.max(-6000,mouseValue.trZ); //获取变化中的最大值，最远的视窗为-6000
+
+            $("#main").css({
+                "transform":"translateZ(" + mouseValue.trZ + "px) rotateY(" + mouseValue.roY+"deg) rotateX(" + mouseValue.roX+"deg)"
+            });
+
+            // 缩放动画缓冲效果，开启定时器
+            mouseValue.timer1 =setInterval(function(){
+                d*=0.9;
+                if (Math.abs(d)<0.01) {
+                    clearInterval(mouseValue.timer1);
+                }
+                mouseValue.trZ +=d*80;
+                mouseValue.trZ =Math.min(1500,mouseValue.trZ);
+                mouseValue.trZ =Math.max(-6000,mouseValue.trZ);
+                $("#main").css({
+                    "transform":"translateZ(" + mouseValue.trZ + "px) rotateY(" + mouseValue.roY+"deg) rotateX(" + mouseValue.roX+"deg)"
+                });
+            },20)
+        });*/
+
+
+
+
+
+        // 开启螺旋效果
+        $(".luoxuan").click(function(){
+            luo();
+        });
+
+
+
+        // 开启球形效果
+        $(".qiu").click(function(){
+            ran();
+        });
+
+
+        // 开启网格效果
+        $(".wangge").click(function(){
+            init();
+        });
+
+
+
+        // 球形效果函数
+        function ran(){
+            var $rotfirstX=0;
+            var $rotfirstY=360/20;
+            var $num = 20;
+            var z=0;
+
+
+            $("#main li").each(function(i){
+                var $rotY = parseInt(i/$rotfirstY);
+                var x =($num*i)%360;
+                if (x>90&&x<270) {
+                    z=180;
+                    console.log(z)
+                }else{
+                    z=0;
+                    console.log(z)
+                }
+                var y =$rotY*$num ;
+                $(this).css({
+                    "transform" : "rotateY("+ y +"deg) rotateX("+ x +"deg) rotateZ("+ z +"deg) translateZ("+ 800 +"px)"
+                });
+            });
+
+        }
+
+
+
+
+
+        // 网格效果函数
+        function init(){
+            for(var i =0;i<value.liNum;i++) {
+
+                $("#main li").each(function(i){
+                    $(this).html('H'+i+'<p>&</p><p>C'+i+'</p>');
+                    var iX =(i % 25) % 5;   //(i % 25)%5得出每层0,1,2,3，4，在X轴上每行共有5个li。不换层，每一平面层li数量为25个。
+
+                    var iY =parseInt((i %25) / 5);//(i % 25)%5得出0,1,2,3,4共五层Y轴表现层，i是5的倍数开始换层。（iY=1为Y轴第一层，iY=2为Y轴第二层，iY=2为Y轴第三层...iY=4为Y轴第五层，）
+
+                    var iZ =parseInt(i / 25);   //parseInt(i / 25)得出0,1,2,3,4,5共5层Z轴表现层，i是25的倍数开始换层。（iZ=1为Z轴第一层，iZ=2为Z轴第二层，iZ=2为Z轴第三层...iZ=4为Z轴第五层，）
+                    $(this).css({
+                        "transform" : "translate3d("+ (value.firstX + iX*value.tX) +"px," + (value.firstY + iY*value.tY ) +"px," + (value.firstZ + iZ*value.tZ ) +"px)"
+                    });
+                });
+            }
+        }
+
+
+        // 螺旋效果函数
+        function luo(){
+            var $num =10;
+            var height = $("#main li").eq(0).css("height");
+            for(var i =0;i<value.liNum;i++) {
+                $("#main li").eq(i).css({
+
+                    // 先Y轴依次旋转10deg,然后拉大视窗距离得到li重叠在一起的一个圆环,最后依次改变Y轴偏移量,这样就可以达到分层的螺旋效果.
+                    "transform" : "rotateY(" + 10*i + "deg) translateZ( "+ 1000 +"px) translateY( "+ ($num*i-600) +"px)"
+
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>

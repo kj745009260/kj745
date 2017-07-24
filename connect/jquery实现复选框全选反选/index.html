@@ -1,0 +1,40 @@
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>aaa</title>
+<script type="text/javascript" src="jquery-1.9.1.js"></script>
+<script type="text/javascript">
+ 
+
+
+
+
+
+
+
+</script>
+</head>
+
+<body>
+<div style="float:left; width:200px; margin-left:300px;">
+<input type="checkbox" class="icheckbox_square-blue" id="allcheck1" />check all1<br /><br />
+<input type="checkbox" class="iCheck1 icheckbox_square-blue" name="iCheck1" />1<br /><br />
+<input type="checkbox" class="iCheck1 icheckbox_square-blue" name="iCheck1" />2<br /><br />
+<input type="checkbox" class="iCheck1 icheckbox_square-blue" name="iCheck1" />3<br /><br />
+<input type="checkbox" class="iCheck1 icheckbox_square-blue" name="iCheck1" />4<br /><br />
+</div> 
+
+<script type="text/javascript">
+  $("#allcheck1").click(function() {
+  	console.log(this.checked);
+    $("input[name='iCheck1']").prop("checked", this.checked);
+	});
+  
+  $("input[name='iCheck1']").click(function() {
+    var $subs = $("input[name='iCheck1']");
+    $("#allcheck1").prop("checked" , $subs.length == $subs.filter(":checked").length ? true :false);
+  });
+</script>
+
+</body>
+</html>

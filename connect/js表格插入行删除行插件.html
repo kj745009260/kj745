@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+<style type="text/css"> 
+ 
+</style>
+<script>
+  (function(window){
+	 var win = window;
+	 var actTr = function(table,num,tr){
+		 if(!tr){  //删除操作
+			 var _num = table.rows[num];
+			 if(_num){
+				 table.deleteRow(num);
+				 return true;
+			 }else{
+				 return false;
+			 }
+		 }else{   //添加操作 
+		     var row = table.insertRow(num);
+			 var i=0;
+			 len = tr.length;
+			 for(;i<len;++i){
+				 row.insertCell(i).innerHTML = tr[i];
+			 }
+			 return true;
+		 }
+     }
+	 win.actTr = actTr;
+   })(window)
+</script> 
+</head>
+
+<body>
+  <table>
+    <tr><td>1</td><td>2</td><td>3</td></tr>
+    <tr><td>4</td><td>5</td><td>6</td></tr>
+    <tr><td>7</td><td>8</td><td>9</td></tr>
+  </table>
+</body>
+</html>
+<script>
+  var table = document.querySelector('table');
+   actTr(table,1);
+   actTr(table,2,[10,11]);
+</script>

@@ -1,0 +1,7 @@
+消除图片底部间隙的方法
+
+1.图片块状化  img{ display:block;}
+
+2.图片底线对齐 img{ vertical-align:bottom;}
+
+3.行高足够小 img{ line-height:0;}

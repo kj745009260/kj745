@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+<style type="text/css">
+  .list { border:1px solid red; margin:10px 0; width:400px; font-size:0;}
+  .list span { display:inline-block; width:200px; vertical-align:middle; font-size:16px;}
+  .list img {vertical-align:middle;}
+</style>
+</head>
+<!--  去掉inline-block之间的空隙使用 注释 或者font-size:0 -->
+<body>
+ <div class="list">
+   <img src="img/3333.jpg"/>
+
+   <span>文字文字</span>
+ </div>
+ <div class="list">
+   <span>文字文字<br/>文字文字</span>
+   <img src="img/3333.jpg"/>
+ </div>
+ <div class="list">cn
+   <span>文字文字<br/>文字文字<br/>文字文字<br/>文字文字</span><!--
+   --><img src="img/3333.jpg"/>
+ </div>
+ <div class="list">
+   <span>文字文字<br/>文字文字<br/>文字文字<br/>文字文字<br/>文字文字<br/>文字文字<br/>文字文字<br/>文字文字<br/>文字文字<br/>文字文字<br/>文字文字<br/>文字文字<br/>文字文字</span><!--
+   --><img src="img/3333.jpg"/>
+ 1</div>
+
+ <style type="text/css">
+   .smallimg { font-size:16px;}
+   .smallimg img { vertical-align:-15px;}
+ </style>
+ <div class="smallimg">
+   <img src="img/xunzhang_small.png"/>我们的的t
+ </div>
+
+ <style type="text/css">
+   .boximg { height:250px; background:#ccc; text-align:center; margin-top:20px;}
+   .boximg img { vertical-align:middle;}
+   .boximg span { display:inline-block; vertical-align:middle;}
+   .boximg i { display:inline-block; height:100%; vertical-align:middle;}
+   /* .boximg:after {display:inline-block; height:100%; vertical-align:middle;}*/
+ </style>
+ <div class="boximg">
+   <img src="img/3333.jpg"/>
+   <i></i>
+ </div>
+
+ <div class="boximg">
+   <span>第一行文字<br/>第一行文字<br/>第一行文字</span>
+   <i></i>
+ </div>
+</body>
+</html>

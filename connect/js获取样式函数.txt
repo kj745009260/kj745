@@ -1,0 +1,7 @@
+function(obj,attr){
+  if(obj.currentStyle){
+    return obj.currentStyle[attr];
+  }else if(window.getComputedStyle){
+    return getComputedStyle(obj,false)[attr];
+  }
+}

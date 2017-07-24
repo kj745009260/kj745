@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>js高级程序设计</title>
+<meta name="viewport" content="initial-scale=1, user-scalable=0, minimal-ui" charset="UTF-8">
+<style>
+#content{width:330;margin:50px auto;}
+#tabs{width:330;}
+#tabs a{padding:5px 15px 5px 15px;background-color:rgba(45,38,176,0.8);color:#fff;text-decoration:none;float:left;border-bottom:solid 1px #ccc;}
+#tabs a.a1{background-color:#fff;color:#000;border-top:solid 1px rgba(45,38,176,0.8);border-left:solid 1px rgba(45,38,176,0.8);border-right:solid 1px rgba(45,38,176,0.8);border-bottom:none;}
+#divs{width:330px; margin-top:10px;}
+#divs div{display:inline;width:280px;height:100px;border-left:solid 1px #ccc;border-right:solid 1px #ccc;border-bottom:solid 1px #ccc;float:left;}
+</style>
+<script type="text/javascript">
+ /* window.onload = function(){
+	  var links = document.getElementsByTagName('a');
+	  var box = document.getElementsByClassName('aa');
+	  var len = links.length;
+	  for(var i=0;i<len;i++){
+		  links[i].index = i;
+		  links[i].onmouseover = function(){
+			  for(var j=0;j<len;j++){
+				  links[j].className = '';
+				  box[j].style.display = 'none';
+			  }
+			  this.className = 'a1';
+			  box[this.index].style.display = 'block';
+		  }
+	  }
+	  
+	  
+  }*/
+  
+  /************************匿名函数**************************/
+  //第一种方式
+  /*var box = function(){
+	  return 111;
+  }
+  alert(box());*/
+  
+  //第二种方式
+  /*(function(){
+	 alert('111');
+  })()*/
+  
+  //第三种方式
+  /*var box = (function(){
+	  return 111;
+  })();
+  alert(box);*/
+  
+  //第四种方式 传递参数
+  /*(function(age){
+	  alert(age)
+  })(100);*/
+  
+  //第五种方式 函数里放匿名函数
+  /*function box(){
+	  return function(){ //闭包
+		  return 111;
+	  }
+  }
+  alert(box()());*/
+  
+  //第六种方式 函数里放匿名函数
+  /*function box(){
+	  return function(){ //闭包
+		  return 111;
+	  }
+  }
+  var b= box();
+  alert(b());*/
+  
+  /************************闭包**************************/
+  //第一种方式
+  /*function box(){
+	var b = 100;
+	return function(){
+		return b;
+	}
+  }
+  alert(box()());*/
+  
+  //第一种方式  通过全局变量累加
+  /*var age=100;
+  function box(){
+	  age++;
+  }
+  alert(age);
+  box();
+  alert(age);*/
+  
+  //第二种方式  闭包累加
+  /*function box(){
+	var age = 100;
+	return function(){
+		age++;
+		return age;
+	}
+  }
+  var b = box();
+  alert(b());
+  alert(b());*/
+  
+  //第二种方式  闭包累加
+  /*function box(){
+	  var arr = [];
+	  for(var i=0;i<5;i++){
+		  arr[i] = (function(){
+			  return i;
+		  })();
+	  }
+	  return arr;
+  }
+  var b = box();
+  alert(b);*/
+  
+  //闭包中this指向window
+  /*var name = 'window';
+  var box = {
+	  name:'box',
+	  run: function(){
+		  return function(){
+			  return this.name;
+		  }
+	  }
+  };*/
+  //alert(box.run()());  //window
+  //alert(box.run().call(box));  //box
+  
+  
+</script> 
+</head>
+
+<body><div id="content">
+<div id="tabs">
+<a href="" class="a1">选项卡一</a>
+<a href="">选项卡二</a>
+<a href="">选项卡三</a>
+</div>
+<div id="divs">
+<div class="aa">这是选项卡一</div>
+<div class="aa" style="display:none;">这是选项卡二</div>
+<div class="aa" style="display:none;">这是选项卡三</div>
+</div>
+</div>
+</body>
+</html>

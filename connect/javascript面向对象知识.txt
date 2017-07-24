@@ -1,0 +1,196 @@
+  //类的定义
+  //1.工厂模型
+  function createPerson(name,sex){
+	  var obj = new Object();
+	  obj.name = name;
+	  obj.sex = sex;
+	  obj.sayName = function(){
+		  return this.name;
+	  }
+	  return obj;
+  }
+  var p1 = new createPerson('z3','nan');
+  var p2 = new createPerson('l4','nv');
+  
+  //2.构造函数式,类名首字母大写,推荐使用
+  function Person(name,sex){
+	  this.name = name;
+	  this.sex = sex;
+	  this.sayName = function(){ //每次创建对象都会生成一个对应的方法，耗资源。使用prototype可以解决
+		  return this.name;
+	  }
+  }
+  var pp1 = new Person('z3','nan');
+  var pp2 = new Person('l4','nv');
+  
+  //instanceof:判断某个对象是否为一个类的实例
+  //alert(pp1 instanceof Person);
+  
+  //创建对象的方式
+  //1.当作构造函数使用
+  var ppp = new Person('z6','nan');
+  //2.当作普通函数去使用.在全局环境定义，直接定义在window上
+  Person('z6','nan');
+  //3.在另一个对象的作用域中调用
+  var o = new Object();
+  Person.call(o,'s7','nv');
+
+  //prototype:创建每一个函数都有一个prototype属性，此属性是一个指针，指向一个对象。
+  //这个对象的用途是将特定的属性和方法包含在内，起到所有实例共享的作用
+  var obj = Person.prototype;
+  obj.sayName = function(){ return this.name;}
+  var ps = new Person('k2','nank');
+  
+  //getPrototypeOf()根据实例对象获得原型对象
+  //Object.getPrototypeOf(p1)
+  
+  //prototype常用模式
+  //1.组合模式
+  function Person(name,age){
+	  this.name = name;
+	  this.age = age;
+  }
+  Person.prototype = {
+	  constructor:Person, // 此处会被枚举出来，注解1可解决此问题
+	  sayName:function(){
+		  return this.name;
+	  }
+  };
+  //注解1
+  Object.defineProperty(Person.prototype,'constructor',{
+	  enumerable:false, //定义不可被枚举
+	  value:Person
+  })
+  
+  //2.动态原型模式
+  function Person(name,age){
+	  this.name = name;
+	  this.age = age;
+	  if(typeof this.sayName != 'function'){
+		  Person.prototype.sayName = function(){
+			  return this.name;
+		  }
+	  }
+  }
+  
+  //3.稳妥构造函数式,非常安全.没有公共属性，不能使用this对象
+  function Person(name){
+	  var obj = new Object();
+	  var name = name;
+	  obj.sayName = function(){
+		  return name;
+	  }
+	  return obj;
+  }
+  
+  var arr = [1,2,3,[4,[5,[6,[7]]]]];
+  Array.prototype.each = function(fn){
+	  try{
+		  if(this.length>0 && fn.constructor == Function){
+			  this.i || (this.i = 0);
+			  while(this.i < this.length){
+				  var e = this[this.i];
+				  if(e && e.constructor == Array){
+					  e.each(fn);
+				  }else{
+					  fn.call(e,e);
+				  }
+				  this.i++;
+			  }
+			  this.i = null
+		  }
+	  }catch(ex){
+	  }
+  }
+  arr.each(function(item){
+	  //alert(item);
+  })
+  
+  //构造函数  原型对象  实例对象
+  //1.构造函数.prototype = 原型对象
+  //2.原型对象.constructor = 构造函数
+  //3.原型对象.isPrototypeOf(实例对象) 判断实例对象的原型是不是 当前原型对象
+  //4.构造函数 实例对象  类与实例的关系
+  
+  //继承
+  //1.原型继承。继承父类模版和原型对象
+  function Parent(name){
+	  this.name = name;
+  }
+  Parent.prototype = {
+	  constructor:Parent,
+	  sayName:function(){
+		  return this.name;
+	  }
+  };
+  
+  function Children(age){
+	  this.age = age;
+  }
+  Children.prototype = new Parent('李四');
+  var c1 = new Children(20);
+
+  //2.类继承。只继承父类模版,不继承父类原型对象
+  function Parent(name){
+	  this.name = name;
+  }
+  Parent.prototype = {
+	  constructor:Parent,
+	  sayName:function(){
+		  return this.name;
+	  }
+  };
+  
+  function Children(name,age){
+	  Parent.call(this,name);
+	  this.age = age;
+  }
+  var c2 = new Children('lx',21);
+  alert(c2.name); //c2.sayName is not a function
+
+  //3.混合继承,推荐使用.缺点：子类继承了2次父类的模版
+  function Parent(name){
+	  this.name = name;
+  }
+  Parent.prototype = {
+	  constructor:Parent,
+	  sayName:function(){
+		  return this.name;
+	  }
+  };
+  
+  function Children(name,age){
+	  Parent.call(this,name);
+	  this.age = age;
+  }
+  Children.prototype = new Parent();
+  var c3 = new Children('lx',21);
+ 
+  //4.最佳继承。只继承一次父类模版和原型对象
+  function Parent(name){
+	  this.name = name;
+  }
+  Parent.prototype = {
+	  constructor:Parent,
+	  sayName:function(){
+		  return this.name;
+	  }
+  };
+  
+  function Children(name,age){
+	  Parent.call(this,name);
+	  this.age = age;
+  }
+  
+  function extendParent(parent,children){ //只继承父类的原型对象
+	  var F = new Function();
+	  F.prototype = parent.prototype;
+	  children.prototype = new F();    //原型继承
+	  children.prototype.constructor = children; //还原子类的构造器
+	  children.childClass = parent.prototype; //保存父类的原型对象,可以在子类中获取父类
+	  if(parent.prototype.constructor == Object.prototype.constructor){
+		  parent.prototype.constructor = parent;  //还原父类构造器
+	  }
+  }
+  extendParent(Parent,Children);
+  var c4 = new Children('ct',34);

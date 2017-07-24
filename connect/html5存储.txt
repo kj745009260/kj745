@@ -1,0 +1,42 @@
+cookie存储的缺点：
+1.http请求头上会带着
+2.每个域名下只有4K
+3.主Domain污染
+
+function setCookie(name,value)
+{
+var Days = 30;
+var exp = new Date();
+exp.setTime(exp.getTime() + Days*24*60*60*1000);
+document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();
+}
+
+function getCookie(name)
+{
+var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+if(arr=document.cookie.match(reg))
+return unescape(arr[2]);
+else
+return null;
+}
+
+function delCookie(name)
+{
+var exp = new Date();
+exp.setTime(exp.getTime() - 1);
+var cval=getCookie(name);
+if(cval!=null)
+document.cookie= name + "="+cval+";expires="+exp.toGMTString();
+}
+
+localStorage && sessionStorage
+1.存储形式 key=>value
+2.永久存储，永不失效，除非手动删除
+3.每个域名5M
+
+localStorage用法
+存储 localStorage.setItem(name,value)
+读取 localStorage.getItem(name)
+     localStorage.key(0)
+删除 localStorage.removeItem(name)
+全部删除 localStorage.clear()

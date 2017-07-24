@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	
+</body>
+</html>
+<script>
+
+    /*
+     *  前端性能优化方案
+     */
+    /*1.减少http请求，合理设置 HTTP缓存
+        减少http的主要手段是合并CSS、合并JavaScript、合并图片
+      2.使用浏览器缓存
+        对一个网站而言，CSS、javascript、logo、图标这些静态资源文件更新的频率都比较低，而这些文件又几乎是每次http请求都需要的，如果将这些文件缓存在浏览器中，可以极好的改善性能。通过设置http头中的cache-control和expires的属性，可设定浏览器缓存，缓存时间可以是数天，甚至是几个月
+      3.启用压缩
+        在服务器端对文件进行压缩，在浏览器端对文件解压缩，可有效减少通信传输的数据量。如果可以的话，尽可能的将外部的脚本、样式进行合并，多个合为一个。
+      4.CSS Sprites   合并 CSS图片，减少请求数的又一个好办法。
+      5.LazyLoad Images
+        这条策略实际上并不一定能减少 HTTP请求数，但是却能在某些条件下或者页面刚加载时减少 HTTP请求数。对于图片而言，在页面刚加载的时候可以只加载第一屏，当用户继续往后滚屏的时候才加载后续的图片。这样一来，假如用户只对第一屏的内容感兴趣时，那剩余的图片请求就都节省了。
+      6.CSS放在页面最上部，javascript放在页面最下面
+        浏览器会在下载完成全部CSS之后才对整个页面进行渲染，因此最好的做法是将CSS放在页面最上面，让浏览器尽快下载CSS。如果将 CSS放在其他地方比如 BODY中，则浏览器有可能还未下载和解析到 CSS就已经开始渲染页面了，这就导致页面由无 CSS状态跳转到 CSS状态，用户体验比较糟糕，所以可以考虑将CSS放在HEAD中。
+
+        Javascript则相反，浏览器在加载javascript后立即执行，有可能会阻塞整个页面，造成页面显示缓慢，因此javascript最好放在页面最下面。但如果页面解析时就需要用到javascript，这时放到底部就不合适了。
+      8.减少cookie传输
+        一方面，cookie包含在每次请求和响应中，太大的cookie会严重影响数据传输，因此哪些数据需要写入cookie需要慎重考虑，尽量减少cookie中传输的数据量。另一方面，对于某些静态资源的访问，如CSS、script等，发送cookie没有意义，可以考虑静态资源使用独立域名访问，避免请求静态资源时发送cookie，减少cookie传输次数。
+    */
+
+
+    /*
+     *   Cookie && WebStorage(LocalStorage,sessionStorage)
+     */
+     
+    function setCookie(name, value){
+	    var days = 30;
+	    var exp = new Date();
+	    exp.setTime(exp.getTime() + days * 24 * 3600 * 1000);
+	    document.cookie = name + '=' + escape(value) + ';expires=' + exp.toUTCString();
+    }
+
+    function getCookie(name){
+	    var arr,
+	        reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+	    if(arr = document.cookie.match(reg)){ console.log(arr);
+	    	return unescape(arr[2]);
+	    }
+	    return null;
+    }
+
+    function delCookie(name){
+    	var exp =  new Date();
+    	exp.setTime(exp.getTime() - 1);
+    	var cval = getCookie(name);
+    	if(cval != null){
+    		document.cookie = name + '=' + cval + ';expires=' + exp.toUTCString();
+    	}
+    }
+
+    /*
+    1.Web Storage数据完全存储在客户端，不需要通过浏览器的请求将数据传给服务器，因此相比cookie来说能够存储更多的数据，大概5M左右。单个cookie在客户端的限制是4K。
+
+    2.LocalStorage和sessionStorage功能上是一样的，但是存储持久时间不一样。
+      LocalStorage：浏览器关闭了数据仍然可以保存下来，并可用于所有同源（相同的域名、协议和端口）窗口（或标签页）永久存储，永不失效，除非手动删除
+      sessionStorage：数据存储在窗口对象中，窗口关闭后对应的窗口对象消失，存储的数据也会丢失。就是浏览器窗口关闭就失效了。
+      注意：sessionStorage 都可以用localStorage 来代替，但需要记住的是，在窗口或者标签页关闭时，使用sessionStorage 存储的数据会丢失。
+    3.使用 local storage和session storage主要通过在js中操作这两个对象来实现，分别为window.localStorage和window.sessionStorage.
+
+    成员名	               方法参数	                 描述
+    length	               属性	                     获取存储数据的条数
+    key(n)　　　　          n:索引值	                 根据索引值，返回键名
+    getItem(key)           key:键名	                 根据键名，获取数据值
+    setItem(key,value)	   key:键名 value:键值	     根据键名和键值设置数据项，如果键名已经存在，则覆盖值
+    removeItem(key)	       key:键名	                 根据键名删除一个数据项
+    clear()	               无	                     清空当前的Storage对象
+    */
+
+
+    /*
+     *  get  &&  post 区别
+     */
+    /*
+    Get是向服务器发索取数据的一种请求，而Post是向服务器提交数据的一种请求
+    1.GET请求的数据会附在URL之后（就是把数据放置在HTTP协议头中），以?分割URL和传输数据，参数之间以&相连，如：login.action?name=hyddd&password=idontknow&verify=%E4%BD%A0%E5%A5%BD。
+      POST把提交的数据则放置在是HTTP包的包体中。
+    2.GET方式提交的数据最多只能是1024字节(url的长度，根据浏览器和服务器而定)，理论上POST没有限制，可传较大量的数据，
+    3.POST的安全性要比GET的安全性高。注意：这里所说的安全性和上面GET提到的“安全”不是同个概念。上面“安全”的含义仅仅是不作数据修改，而这里安全的含义是真正的Security的含义，比如：通过GET提交数据，用户名和密码将明文出现在URL上，因为(1)登录页面有可能被浏览器缓存，(2)其他人查看浏览器的历史纪录，那么别人就可以拿到你的账号和密码了，除此之外，使用GET提交数据还可能会造成Cross-site request forgery攻击。
+    */
+
+
+    /*
+     * 缓存机制
+     */
+    /*
+    1.浏览器缓存
+      页面的缓存状态是由header决定的，header的参数有四种：
+      一、Cache-Control：
+          1、max-age（单位为s）指定设置缓存最大的有效时间，定义的是时间长短。当浏览器向服务器发送请求后，在max-age这段时间里浏览器就不会再向服务器发送请求了
+          2、s-maxage（单位为s）同max-age，只用于共享缓存（比如CDN缓存）。
+          3、public 指定响应会被缓存，并且在多用户间共享。也就是下图的意思。如果没有指定public还是private，则默认为public。
+          4、private 响应只作为私有的缓存（见下图），不能在用户间共享。如果要求HTTP认证，响应会自动设置为private。
+          5、no-cache 指定不缓存响应，表明资源不进行缓存
+             但是设置了no-cache之后并不代表浏览器不缓存，而是在缓存前要向服务器确认资源是否被更改。因此有的时候只设置no-cache防止缓存还是不够保险，还可以加上private指令，将过期时间设为过去的时间。
+          6、no-store 绝对禁止缓存，一看就知道如果用了这个命令当然就是不会进行缓存啦～每次请求资源都要从服务器重新获取。
+          7、must-revalidate指定如果页面是过期的，则去服务器进行获取。这个指令并不常用，就不做过多的讨论了。
+      二、Expires  缓存过期时间，用来指定资源到期的时间，是服务器端的具体的时间点。也就是说，Expires=max-age + 请求时间，需要和Last-modified结合使用。
+      三、Last-modified  服务器端文件的最后修改时间，需要和cache-control共同使用，是检查服务器端资源是否更新的一种方式。当浏览器再次进行请求时，会向服务器传送If-Modified-Since报头，询问Last-Modified时间点之后资源是否被修改过。如果没有修改，则返回码为304，使用缓存；如果修改过，则再次去服务器请求资源，返回码和首次请求相同为200，资源为服务器最新资源。
+
+    */
+
+
+    /*
+     *  AJAX
+     */
+    // http://   www   .   google  :   8080   /script/jquery.js
+    // 协议      子域名      主域名      端口号   请求地址
+    // 当协议、子域名、主域名、端口号中任意一各不相同时，都算不同的“域”。不同的域之间相互请求资源，就叫“跨域”。
+    // 处理跨域的方法1 -- 代理    本域名后端去访问 跨域的服务，然后把获取到的响应值返回给本域名前端。也就是本域名后端在后台做了一个代理
+    // 处理跨域的方法2 -- JSONP   本域名创建一个回调函数，本域名动态创建script标签 跨域返回这个回调函数的调用。只支持get请求
+    /* 处理跨域的方法3 -- XHR2（推荐方法）“XHR2” 全称 “XMLHttpRequest Level2” 是HTML5提供的方法，对跨域访问提供了很好的支持。
+        IE10一下的版本都不支持
+        只需要在服务器端头部加上下面两句代码 
+        header( "Access-Control-Allow-Origin:*" );
+        header( "Access-Control-Allow-Methods:POST,GET" );
+
+        如果需要读取cookie	
+        让跨域的http请求带上cookie等 Access-Control-Allow-Credentials:true
+        同时在xhr发起请求的时候设置参数 xhr.withCredentials = true 
+        在xhr.open()后面执行  xhr.withCredentials = true 否则有些浏览器部分版本会异常，导致设置无效
+       
+        XHR && XHR2
+
+        XHR
+        XHR相对于XHR2的缺点
+        1.只支持文本数据的传送，无法用来读取和上传二进制文件。
+        2.传送和接收数据时，没有进度信息，只能提示有没有完成。
+        3.受到"同域限制"（Same Origin Policy），只能向同一域名的服务器请求数据。
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('get', 'bb.jsp');
+        xhr.send();
+        xhr.onreadystatechange = function(){
+	        if(xhr.readyState == 4 && xhr.status == 200){
+	           console.log(xhr.responseText);
+	        }else{
+	           console.log(xhr.statusText);
+	        }
+        }
+
+        XHR2
+        1.可以设置HTTP请求的时限
+        xhr.timeout = 3000;
+        xhr.ontimeout = function(event){
+	        console.log('超时');
+        }
+        最长等待时间设为3000毫秒。过了这个时限，就自动停止HTTP请求。与之配套的还有一个timeout事件，用来指定回调函数。
+
+        2.上传和下载。下载的progress事件属于XMLHttpRequest对象，上传的progress事件属于XMLHttpRequest.upload对象。
+        xhr.onprogress = updateProgress;
+        xhr.upload.onprogress = updateProgress;
+        function updateProgress(event){
+	       if(event.lengthComputable){
+	          var percentComplete = event.loaded/event.total;
+	       }
+        }
+         * load事件：传输成功完成。　　
+         * abort事件：传输被用户取消。　　
+         * error事件：传输中出现错误。　　
+         * loadstart事件：传输开始。　　
+         * loadEnd事件：传输结束，但是不知道成功还是失败。
+    */
+
+
+    /*
+     *  零碎知识点
+     */
+    /*1.表单编码格式
+        enctype="application/x-www-form-urlencoded"   不能用于文件上传
+        enctype="multipart/form-data"  可用于文件上传
+
+    */
+
+
+    /*
+     *  HTTP协议
+     */
+    /*1.状态码
+        200  客户端发来的请求在服务端被正常处理了
+        204  请求被正常处理，但返回的响应报文不含实体的主体部分，一般在客户端往服务端发消息时使用
+        206  客户端进行了范围请求，服务端成功执行了这部分get请求
+
+        301  永久性重定向，表示请求的资源被分配了新的URI，以后使用新的URL访问
+        302  临时性重定向，表示请求的资源被分配了新的URI，本次使用新的URL访问
+        303              表示请求的资源存在另外一个URI，应使用GET方法定向获取该资源
+        304              表示客户端发送附带请求时，服务端允许访问资源，但为满足情况
+        307  临时性重定向
+
+        400  请求的报文中存在语法错误
+        401  发送的请求需要有HTTP认证
+        403  对请求资源的访问被服务器拒绝了
+        404  服务器无法找到请求的资源
+
+        500  服务端在执行请求时发生了错误
+        503  服务器暂时处于超负载或正在进行停机维护，现在无法处理请求。
+    */
+
+
+    /*
+     *  JavaScript
+     */
+    	//1.基本数据类型：string \ number \ boolean \ null \ undefined   |  对象object(非基本类型)
+    	//2.typeof返回 ：string \ number \ boolean \ function \ undefined \ object
+    	//2.1 typeof NaN == 'number'
+    	//3.空字符串""、null、undefined、数字0、数字NaN 会转化为false
+    	//4.字符串"0","false" 会转化成true
+    	//5.优先级 ! > && > ||
+    	//6.instanceof 就是判断一个实例是否属于某种类型  (array)
+
+	function setup(arr){
+		var i=0;
+		return function(){
+			return arr[i++];
+		}
+	}
+	var textc = setup(['a','b','c']);
+	textc();  // a
+	textc();  // b
+	textc();  // c
+ 
+    setup(['a','b','c'])();  //a
+    setup(['a','b','c'])();  //a
+    setup(['a','b','c'])();  //a
+
+    function f(){
+    	var arr = [];
+    	var i;
+    	for(var i=0; i<3; i++){ //i=2执行后  再自增1
+    		arr[i] = function(){
+    			return i;
+    		}
+    	}
+    	return arr;
+    }
+    var testf = f();
+    console.log(testf[0]());  //3
+    console.log(testf[1]());  //3
+    console.log(testf[2]());  //3
+
+    function tf(){
+    	var arr = [];
+    	var i;
+    	for(var i=0; i<3; i++){ //i=2执行后  再自增1
+    		arr[i] = (function(x){
+    			return function(){
+    				return x;
+    			}
+    		})(i)
+    	}
+    	return arr;
+    }
+    var testf = tf();
+    console.log(testf[0]());  //0
+    console.log(testf[1]());  //1
+    console.log(testf[2]());  //2
+
+
+    var a = 1;
+    function b(){
+    	var a = 2;
+    	function c(){
+    		console.log(this);
+    		console.log(a);
+    	}
+    	c();
+    }
+    b(); // window   2
+
+    function c2(){
+    	this.a = 1;
+    	return {
+    		b:2
+    	}
+    }
+    var testc2 = new c2();
+    console.log(testc2.a); //undefined
+    console.log(testc2.b); //2
+    //构造器只有在返回一个对象时，才会改变this的绑定
+
+
+
+
+    function testsss(a,b){
+    	console.log(arguments.callee.length) //2 返回形参个数 arguments.callee是当前函数的引用
+    	console.log(arguments.length) //1 返回实参个数
+    }
+    testsss('2');
+
+
+
+
+    /*requireJS解决一下问题:
+      1.实现js文件的异步加载，避免网页失去响应；
+      2.管理模块之间的依赖性，便于代码的编写和维护。
+      EX: <script src="js/require.js" defer async="true" data-main="js/main"><\/script>
+          async属性表明这个文件需要异步加载，避免网页失去响应。IE不支持这个属性，只支持defer，所以把defer也写上。
+          data-main属性的作用是，指定网页程序的主模块。在上例中，就是js目录下面的main.js，这个文件会第一个被require.js加载。由于require.js默认的文件后缀名是js，所以可以把main.js简写成main。
+
+      主模块main.js写法
+          require(['moduleA','moduleB','moduleC'], function(moduleA, moduleB, moduleC){})
+
+      使用require.config()方法，我们可以对模块的加载行为进行自定义。require.config()就写在主模块（main.js）的头部。参数就是一个对象，这个对象的paths属性指定各个模块的加载路径。
+          require.config({
+              baseUrl: 'js/lib',
+              paths: {
+                 'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min',
+                 'underscore': 'underscore.min',
+                 'backbone': 'backbone.min'
+              }
+          })
+
+      AMD模块的写法----模块必须采用特定的define()函数来定义。如果一个模块不依赖其他模块，那么可以直接定义在define()函数之中。
+          定义模块math:
+             define(['依赖模块'],function(){
+                 var add = function(x, y){
+                      return x + y;
+                 }
+                 return {
+                     add: add
+                 }
+             })
+          加载模块:
+             require(['math'], function(math){
+                 math.add(1,1)
+             })
+
+      加载非规范的模块----理论上，require.js加载的模块，必须是按照AMD规范、用define()函数定义的模块。但是实际上，虽然已经有一部分流行的函数库（比如jQuery）符合AMD规范，更多的库并不符合。
+          require.config({
+             shim:{
+                 'underscore':{
+                     exports: '_'
+                 },
+                 'backbone':{
+                     deps: ['underscore','jquery'],  //依赖
+                     exports: 'Backbone'
+                 },
+                 'jquery.scroll':{
+                     deps: ['jquery'],
+                     exports: 'jQuery.fn.scroll'
+                 }
+             }
+          })
+    */
+
+
+    var arr = [1,2,4,3,3,3,23,12,4,5,3,3,78,90,90];
+
+    function sortarray(a, b){
+       if(a < b){
+          return 1;
+       }else{
+          return -1;
+       }
+    }
+    var a = [], b = [], c = [];
+    var o = {};
+    var s = arr.sort(sortarray);
+    console.log(s);
+    s.forEach(function(v, k){
+        if(!checkExies(v, a)){
+           a.push(v);
+           o[v] = 1;
+        }else{
+           o[v]++;
+        }
+    })
+    console.log(o);
+    for(var i in o){
+
+    }
+    
+
+    
+
+    function checkExies(value, array){
+       var l = array.length;
+       for(var i=0; i<l; i++){
+          if(array[i] === value){
+              return true;
+          }
+       }
+       return false;
+    }
+
+
+
+
+
+
+</script>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>首页</title>
+    <style type="text/javascript">
+	   html{ font-size:25px;}
+	</style>
+    <script type="text/javascript">
+	//window.onload加载多个函数
+	/*function a(){ alert("1");}
+	function b(){ alert("2");}
+	如下方式,函数b会覆盖函数a
+	window.onload = a;
+	window.onload = b;
+	第一种解决方式
+	window.onload = function(){
+		a();
+		b();
+	}
+	第二种解决方式
+	function addLoadEvent(func){
+		var oldOnload = window.onload;
+		if(typeof window.onload != "function"){
+			window.onload = func;
+		}else{
+			window.onload = function(){
+				oldOnload();
+				func();
+			}
+		}
+	}
+	//addLoadEvent(a);
+	//addLoadEvent(b);
+	
+	//使用class获取元素的时候，返回的是结果集(使用元素名获取的时候，返回的也是结果集。)
+	window.onload = function(){
+		if(document.getElementsByClassName){
+			var sel = document.getElementsByClassName("sel")[0];
+			sel.onchange = function(){
+				alert(sel.value);
+			}
+		}
+	}*/
+	
+	//返回窗口文档显示区的宽度和高度
+    //var width = window.innerWidth;
+	//var height = window.innerHeight;
+	//返回窗口的外部宽度和高度
+	//var width1 = window.outerWidth;
+	//var height1 = window.outerHeight;
+	//返回显示屏幕的高度与宽度(除了windows任务栏外)
+	//var width2 = screen.availHeight;
+	//var height2 = screen.availWidth;
+	//返回显示器屏幕的宽度与高度
+	//var width3 = screen.width;
+	//var height3 = screen.height;
+	//alert(width2 +"+"+ height2 + "   " + width3+"+"+height3);
+	
+	//带有确定和取消按钮的弹出框
+	/*var r = confirm("press a button");
+	if(r == true){
+		alert("you pressed ok");
+	}else{
+		alert("you pressed cancel");
+	}*/
+	
+	//向元素添加新的子节点，作为最后一个子节点
+	function addnewnode(){
+		var txt = document.getElementsByClassName("txt")[0];
+		var newnode = document.createElement("span");//创建元素节点
+		var newnodetxt = document.createTextNode("3333");//创建文本节点
+		newnode.appendChild(newnodetxt);//向元素添加新的子节点，作为最后一个子节点。
+		//txt.appendChild(newnode);//内部最后面插入
+		//txt.insertBefore(newnode,txt.childNodes[0]);//在内部指定元素前面插入
+		
+		var classname = document.getElementsByTagName("p")[0].className; //设置或返回元素的class属性
+		var firstchild = document.getElementsByClassName("txt")[0].firstChild.childNodes[0].nodeValue;//设置或返回第一个子元素的值
+		var getattribute1 = document.getElementsByTagName("p")[0].getAttribute("class");//设置或返回属性的值
+		var getattribute2 = document.getElementsByTagName("p")[0].getAttributeNode("class").value;//设置或返回属性的值
+		var getid = document.getElementsByTagName("input")[0].id;//设置或返回元素的id
+		var innerhtml = document.getElementsByClassName("txt")[0].innerHTML;//设置或返回元素的内容
+		var nextsibling = document.getElementsByClassName("sp1")[0].nextSibling.id;//设置或返回下一个兄弟元素的id
+		var previoussibling = document.getElementsByClassName("sp1")[0].previousSibling.childNodes[0].nodeValue;//上一个兄弟元素
+		//document.getElementsByClassName("txt")[0].lastChild.removeAttribute("id");//删除最后一个子元素的id属性
+		var style = document.getElementById("sp2").getAttributeNode("style");//返回最后一个子元素的属性名称
+		//document.getElementsByClassName("txt")[0].lastChild.removeAttributeNode(style);//删除最后一个子元素的指定属性
+		var firstchild = document.getElementsByClassName("txt")[0].childNodes[0];//获取第一个子节点
+		//document.getElementsByClassName("txt")[0].removeChild(firstchild);//删除第一个子节点
+		var textnode = document.createTextNode("4444");//创建文本节点
+		var replacenode = document.getElementsByClassName("txt")[0].childNodes[0];//返回要替换的子节点
+		//replacenode.replaceChild(textnode,replacenode.childNodes[0]);//替换子节点的文本
+		//document.getElementsByTagName("input")[0].setAttribute("type","text");//设置元素的属性
+		var createattribute = document.createAttribute("class");//创建属性节点
+		createattribute.nodeValue = "create";//设置节点的值
+		//document.getElementsByClassName("txt")[0].setAttributeNode(createattribute);//设置或更改指定属性节点
+		//document.write(previoussibling);
+	}
+	
+	//利用arguments判断传递参数的个数，以实现函数的重载
+	function jisuan(){
+	  if(arguments.length == 1){
+		  document.write(arguments[0]+"<br/>");
+	  }else if(arguments.length == 2){
+	      document.write(arguments[0]+arguments[1]+"<br/>");
+	  }else{
+		  var str=1;
+		  for(var i=0;i<arguments.length;i++){
+			   str *= arguments[i];
+		  } 
+		  document.write(str+"<br/>");
+	  }
+	}
+	//jisuan(10);
+	//jisuan(10,99);
+	//jisuan(1,2,3);
+	//jisuan(1,20,30,4,5);
+	
+	//闭包实现计时器
+	/*var abc = function count(){
+	  var count=60;
+	  return function(){
+		  count--;
+		  document.getElementById("count").innerHTML = count;
+		  if(count > 0){
+		  setTimeout(abc,1000);
+		  }
+	  }	  
+	}();*/
+	
+	//数组的迭代方法
+	//var arr=[1,2,3,4,5,6,7,8,9];
+    //1.every方法(所有项都返回true，才返回true)
+	//var everyres = arr.every(function(value,index,arr){//参数：数组项的值，该项在数组的位置，数组对象本身
+	//	return value>3;
+	//})
+	//alert(everyres); //输出false
+	//2.some方法(某一项返回true，就返回true)
+	//var someres = arr.some(function(value,index,arr){
+	//	return value>3;
+	//})
+	//alert(someres); //返回true
+	//3.filter方法(确定并返回数组中是否包含某一项或几项)
+	//var filterres = arr.filter(function(value,index,arr){
+	//	return value>6;
+	//})
+	//alert(filterres);//返回数组7，8，9
+	//4.map方法(对数组的每一项进行操作)
+	//var mapres = arr.map(function(value,index,arr){
+	//	return value*2;
+	//})
+	//alert(mapres);//返回数组2,4,6,8,10,12,14,16,18
+	//5.foreach方法(对数组的每一项执行某些操作)
+	//var foreachres = arr.forEach(function(value,index,arr){
+	//	//执行某些操作
+	//})
+	/*window.onload = function(){
+		var reduce = document.getElementsByClassName("reduceone");
+		var par = document.getElementsByClassName("pro_list")[0];
+		for(var i=0;i<reduce.length;i++){
+			var hd = reduce[i].parentNode;
+			var hd1 = hd.parentNode;
+			var con = hd.cloneNode(true);
+			hd1.removeChild(hd);
+			par.insertBefore(con,par.childNodes[0]);
+		}
+	}*/
+
+    </script>
+        
+</head>
+<body>
+<!--<p class="txt"><span class="sp0">0000</span><span class="sp1">1111</span><span id="sp2" style="color:red;">2222</span></p>
+<input type="button" id="btn"  value="点击">   
+<p id="count">60</p> 
+<input type="button" value="点击" onClick="setTimeout(abc,1000)"> -->
+<ul class="pro_list">
+<li class="soldnone"><p>1111</p></li>
+<li class="soldnone"><p>2222</p></li>
+<li class="soldnone"><p class="reduceone"><a href="http://www.hao123.com">3333</a></p><p class="reduceone"><a href="http://www.hao123.com">31313131</a></p></li>
+<li class="soldnone"><p>4444</p></li>
+<li class="soldnone"><p class="reduceone"><a href="http://www.hao123.com">5555</a></p><p class="reduceone"><a href="http://www.hao123.com">51515151</a></p></li>
+</ul>
+</body>
+</html>
+

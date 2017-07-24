@@ -1,0 +1,104 @@
+  //定义接口3种方式
+  //1.注解描述。很少用
+  //优点：程序员可以有一个参考
+  //缺点：属于文档的范畴。太松散，没有检查接口的方法是否完全被实现
+    /**
+	 *  interface Composite(){
+	 *	   function add(obj);
+	 *	   function remove(obj);
+	 *	   function update(obj);
+	 *	}
+	 */
+	 var CompositeImp = function(){}  //CompositeImp implements Composite
+	 CompositeImp.prototype.add = function(){}
+	 CompositeImp.prototype.remove = function(){}
+	 CompositeImp.prototype.update = function(){}
+	 
+  //2.属性检测
+  //优点：可以检测接口
+  //缺点：不能检测接口里的方法
+    /**
+	 *  interface Composite(){
+	 *	   function add(obj);
+	 *	   function remove(obj);
+	 *	   function update(obj);
+	 *	}
+	 *  interface FormItem(){
+	 *	   function select(obj);
+	 *	}
+	 */
+     var CompositeImp = function(){  //CompositeImp implements Composite,FormItem
+	    //使用固定的名字接收要实现的接口
+		this.implementsInterface = ['Composite','FormItem'];
+	 }  
+	 CompositeImp.prototype.add = function(){}
+	 CompositeImp.prototype.remove = function(){}
+	 CompositeImp.prototype.update = function(){}
+	 CompositeImp.prototype.select = function(){}
+	 
+	 function checkCompositeImp(instance){
+		 if(!isImplements(instance,'Composite','FormItem')){
+			 throw new Error('没有完全实现');
+		 }
+	 }
+	 function isImplements(obj){
+		 for(var i=1;i<arguments.length;i++){
+			 var interfaceName = arguments[i];
+			 var interfaceFound = false;
+			 for(var j=0;j<arguments[0].implementsInterface.length;j++){
+				 if(obj.implementsInterface[j] == interfaceName){
+					 interfaceFound = true;
+					 break;
+				 }
+			 }
+			 if(!interfaceFound){
+				 return false;
+			 }
+		 }
+		 return true;
+	 }
+	 var c1 = new CompositeImp();
+	 //checkCompositeImp(c1);
+	 
+  //3.鸭式辨型.完全面向对象，代码统一
+  //定义接口类
+	var Interface = function(name,methods){
+		if(arguments.length != 2){
+			throw new Error('传递参数不对0');
+		}
+		this.name = name;
+		this.methods = [];
+		for(var i=0,length=methods.length;i<length;i++){
+			if(typeof methods[i] !== 'string'){
+				throw new Error('方法名称不对');
+			}
+			this.methods.push(methods[i]);
+		}
+	}
+	var CompositeInterface = new Interface('CompositeInterface',['add','remove']);
+	var FormItemInterface = new Interface('FormItemInterface',['select','update']);
+	var CompositeImp = function(){}
+	CompositeImp.prototype.add = function(){}
+	CompositeImp.prototype.remove = function(){}
+	CompositeImp.prototype.update = function(){}
+	CompositeImp.prototype.select = function(){}
+	
+	Interface.isSureImplement = function(obj){
+		if(arguments.length < 2){
+			throw new Error('传递参数不对1');
+		}
+		for(var i=1,length=arguments.length;i<length;i++){
+			var instanceInterface = arguments[i];
+			if(instanceInterface.constructor !== Interface){
+				throw new Error('传递参数不对2');
+			}
+			for(var j=0;j<instanceInterface.methods.length;j++){
+				var methodName = instanceInterface.methods[j];
+				if(!arguments[0][methodName] || typeof arguments[0][methodName] != 'function'){
+					throw new Error('方法'+methodName+'没有实现');
+				}
+			}
+		}
+	}
+	var c6 = new CompositeImp();
+	Interface.isSureImplement(c6,CompositeInterface,FormItemInterface);

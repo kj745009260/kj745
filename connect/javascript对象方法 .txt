@@ -1,0 +1,38 @@
+obj.Constructor  保存着创建当前对象的构造函数
+obj.hasOwnProperty(name) 检测给定的属性是否在当前对象实例中（不是原型）
+isPrototypeOf(object)检查传入的对象是否是另一个对象的原型
+propertylesEnumerable(propertyName) 检查给定的属性是否能使用for-in枚举
+toLocalString() 返回对象的字符串表示。该字符串与执行环境的地区对应
+toString() 返回对象的字符串表示
+valueOf() 返回对象的字符串、数值或布尔表示
+
+encodeURI(str) 编码，只会对空格编码 即转化成20%
+encodeURIComponent(str) 常用方法，任何不标准的文字都会进行编码
+decodeURI(str) 解码
+decodeURIComponent(str)  解码
+
+eval(str) 类似无形的javascript解析器,把str转化成一段可执行的js代码
+数组字符串直接使用 eval(strArray)
+var strobj = "{name:'aaa',age:20}";
+strobj转化成对象 eval('('+strobj+')');
+
+parseInt()  parseFloat() 
+
+escape() unescape() 转码  解码
+
+isNaN() 不是numer返回类型true，是number类型返回false
+
+在js里 只有NaN自己不等于自己
+
+Math.random()  产生【0-1）包含0不包含1的随机数
+
+var date = new Date()
+var year = date.getFullYear(); 获取4位数年份
+var month = date.getMonth()+1; 月份
+var da = date.getDate() 哪一天
+var day = date.getDay() 星期几
+var hours = date.getHours() 小时
+var min = date.getMinutes() 分钟
+var sec = date.getSeconds() 秒
+date.getTime() 获取当前时间的毫秒数
+

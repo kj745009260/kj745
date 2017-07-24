@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta charset="utf-8">
+<title>css里面居中的方法</title>
+<style type="text/css">
+* { margin:0; padding:0;}
+p.tip { width:90%; font-family:"Times New Roman", Times, serif; margin:5px auto;}
+.clearfix:before, .clearfix:after {display:table;content:" ";}
+.clearfix:after {clear:both;}
+.parent_box { outline:1px solid red; position:relative; width:90%; margin:20px auto;}
+.parent_box .child_box1 { width:20%; height:200px; line-height:200px; text-align:center; margin-right:5%; float:left; background-color:#ccc;}
+
+.parent_box .child_box2_1 { 
+     position:absolute;
+	 width:40%;
+	 height:150px;
+	 top:50%;
+	 left:45%;
+	 margin-top:-75px;
+	 margin-left:-20%;
+     background:red; 
+}
+
+.parent_box .child_box2_2 { 
+     position:absolute;
+	 width:40%;
+	 height:150px;
+	 top:0;
+	 right:0;
+	 bottom:0;
+	 left:0;
+	 margin:auto 0 auto 25%;
+	 background:#eee;
+}
+
+.parent_box .child_box2_3 {
+	 position:absolute;
+	 width:40%;
+	 height:150px;
+	 top:50%;
+	 left:45%;
+	 transform:translate(-50%,-50%);
+	 -webkit-transform:translate(-50%,-50%);
+	 -moz-transform:translate(-50%,-50%);
+	 -ms-transform:translate(-50%,-50%);
+	 background:green;
+}
+
+.parent_box .child_box2_4 {
+	 display:table-cell;
+	 vertical-align:middle;
+	 text-align:center;
+     padding: 0 20px; 
+	 height:120px;
+	 background:purple;
+} 
+
+.parent_box .child_box2_5 {
+	 width:100%;
+	 height:90px;
+	 display:-webkit-box;
+	 -webkit-box-pack:center;
+	 -webkit-box-align:center;
+	 background:yellow;
+	 color:black;
+}
+
+.child_box2_6 {
+	position:fixed;
+	display:block;
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+	text-align:center;
+	background:rgba(0,0,0,.5);
+}
+.child_box2_6:before{
+	content:'';
+	display:inline-block;
+	vertical-align:middle;
+	height:100%;
+}
+.child_box2_6 .content{
+	display:inline-block;
+	vertical-align:middle;
+	width:60px;
+	height:60px;
+	line-height:60px;
+	color:red;
+	background:yellow;
+}
+
+.child_box2_7 {
+	position:fixed;
+    width:180px;
+    height:180px;
+    top:50%;
+    left:50%;
+    margin-top:-90px;
+    margin-left:-90px;
+    background:orange;
+}
+
+.child_box2_8 {
+	position:fixed;
+    width:160px;
+    height:160px;
+    top:0;
+    right:0;
+    bottom:0;
+    left:0;
+    margin:auto;
+    background:pink;
+}
+</style>
+<body>
+/*  本身相对于父元素框的居中 */
+ <div class="parent_box clearfix">
+    <div class="child_box1">同级附近元素</div>
+    <div class="child_box2_1">子元素</div>
+ </div>
+ <p class="tip">要点：需设置子元素宽度、高度。</p>
+ 
+ <div class="parent_box clearfix">
+    <div class="child_box1">同级附近元素</div>
+    <div class="child_box2_2">子元素</div>
+ </div>
+ <p class="tip">要点：需设置子元素宽度、高度。</p>
+ 
+ <div class="parent_box clearfix">
+    <div class="child_box1">同级附近元素</div>
+    <div class="child_box2_3">子元素</div>
+ </div>
+ <p class="tip">要点：无需设置子元素宽度、高度。</p>
+ 
+<br/><br/>/*  本身内部子元素框的居中 */ 
+ <div class="parent_box clearfix">
+    <div class="child_box2_4">
+       <p>swswswsws</p>
+       <p>swswswsws</p>
+       <p>swswswsws</p>
+    </div>
+ </div>
+ 
+ <div class="parent_box clearfix">
+    <div class="child_box2_5">
+       <p>swswswsws</p>
+       <p>swswswsws</p>
+       <p>swswswsws</p>
+    </div>
+ </div>
+ 
+
+ /*  本身相对于浏览器窗口的居中 */<!--
+ <div class="child_box2_6">
+    <div class="content"></div>
+ </div>
+ 
+ <div class="child_box2_7"></div>
+ 
+ <div class="child_box2_8">
+    <div class="content"></div>
+ </div>-->
+</body>
+</html>

@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>study js</title>
+</head>
+<body>
+	<a href="#" style="padding:20px; border:4px solid red; margin:12px;">pageView: 348 </a>
+</body>
+</html>
+<script src="" defer async="async"></script>
+<script>
+/*
+    async: 表示应该立即下载脚本。但不妨碍页面中的其他操作，比如下载其他资源或等待加载其他脚本。只对外部脚本文件有效。
+    defer: 表示脚本可以延迟到文档完全被解析并显示后再执行。只对外部文件有效。IE7及以下对嵌入脚本也支持。
+*/
+
+/* 基本概念
+   数据类型: 5种基本数据类型  String  Number  Boolean  Null  Undefined    是按值访问的
+            1种复杂数据类型  Object   是按引用访问的
+  
+   typeof a  返回值: string    a为字符串
+                    number    a为数值
+                    boolean   a为布尔值
+                    undefined a未定义 
+                    object    a为对象或null
+                    function  a为函数
+
+   检测基本数据类型typeof满足需要，检测引用类型时，需要用到instanceof    EX：colors instanceof Array
+   如果网页里存在多个全局环境，instanceof就不好使。使用Array.isArray(value):确定value是否是数组，IE9+支持
+   Object.prototype.toString.call([]) == "[object Array]" 
+
+   数据转化为boolean值      true               false
+                string      任何非空字符串     ""(空字符串)
+                number      任何非0数值        0和NaN
+                object      任何对象           null
+                undefined   无                 undefined
+
+   NaN: 1.任何涉及NaN的操作都会返回NaN
+        2.NaN与任何值都不相等。包括NaN本身
+        isNaN(a) a是一个数值时返回false， a不是一个数值时返回true
+             isNaN接收到一个值时，会尝试 将这个值转化成数值
+             isNaN(NaN)   true
+             isNaN("10")  false  转化成10
+             isNaN(true)  false  转化成1
+             isNaN(false) false  转化成0
+
+   数值转换: Number()  parseInt()  parseFloat()
+*/
+
+/* 字符串  String()    
+        1.如果值有toString()方法，则调用该方法并返回相应的结果
+        2.如果值是null，返回"null"
+        3.如果值是undefined，返回'undefined'
+        var str = Number(10) + ''; 加一个空字符串
+
+   对象Object  
+       constructor: 保存用于创建当前对象的函数。构造函数
+       hasOwnProperty(propertyName): 检查给定的属性在当前对象实例中(而不是实例原型中)是否存在
+       isPrototypeOf(Object): 检查传入的对象是否是另一个对象的原型
+       propertyIsEnumerable(propertyName): 检查给定的属性能否使用for-in语句来枚举
+       toString(): 返回对象的字符串表示
+       valueOf(): 返回对象的字符串、数值或布尔值表示
+
+   相等操作符   
+       null == undefined   true
+       "NaN" == NaN        false
+       5 == NaN            false
+       NaN == NaN          false
+       NaN != NaN          true
+       false == 0          true
+       true == 1           true
+       true == 2           false
+       undefined == 0      false
+       null == 0           false
+       "5" == 5            true
+
+    函数       
+        function get(a, b, c){   
+            arguments.length 实参个数
+            arguments.callee.length  形参个数
+            arguments.callee === get 是成立的
+            caller : 保存着调用当前函数的函数的引用 get.caller == arguments.callee.caller
+        }
+
+    数组        
+       join(): 以分隔符来连接数组的每一项，返回构建字符串。默认以逗号分割。原数组不变。
+       push(): 在数组末尾添加元素，返回修改后数组的长度。原数组改变
+       pop():  从数组末尾移除最后一项，返回移除的项。原数组改变
+       shift():移除数组的第一项，返回该项。原数组改变
+       unshift():在数组前端添加任意项，返回新数组的长度。原数组改变
+       reverse():反转数组项的顺序。返回反转后的数组。原数组改变
+       sort(): 对数组排序。[0, 1, 5, 10, 15].sort = [0, 1, 10, 15, 5];  会根据第一位来排序，不准确。
+               返回排序后的数组。原数组改变。
+               可接收一个比较函数，进行排序: 1.第一个参数位于第二个参数之前，返回一个负数
+                                         2.两个参数相等，返回0
+                                         3.第一个参数位于第二个参数之后，返回一个正数
+                function compile(a, b){
+                    if(a < b){
+                       return -1;
+                    }else(a > b){
+                       return 1;
+                    }else{
+                       return 0;
+                    }
+                }
+                [0, 1, 5, 10, 15].sort(compile) = [0, 1, 5, 10, 15]
+
+       concat():创建当前数组的副本，将接收到的参数添加到副本的末尾，返回新构建的数组。原数组不变。
+                参数为数组时，将数组的每一项添加到结果数组中；
+                参数不是数组时，这些参数被简单的添加到结果数组的末尾；
+
+       slice(start,end): 返回[start,end)构成的新数组，原数组不变。
+                         如果参数里有负数，则用数组长度加上该参数确定相应的位置
+                         如果end < start, 返回空数组
+
+       splice(start, 删除的项数，插入项， 插入项): 返回删除的项组成的数组。会改变原数组。
+
+       IE9+支持以下两个方法：
+       indexOf(查找的项，查找的起始位置): 会使用===去比较是否相等。返回查找项在数组里位置；没有找到返回-1；
+       lastIndexOf(查找的项，查找的起始位置): 从数组末尾开始查找。
+
+       迭代方法：每个方法接收2个参数，[运行的函数， 运行该函数的作用域对象], 不会改变数组. IE9+
+       every(function(value, index, array){}): 给定函数运行数组每一项。函数对每一项返回true, 则返回true
+       filter(): 给定函数运行数组每一项。返回true的项组成的数组
+       forEach(): 给定函数运行数组每一项。没有返回值。
+       map(): 给定函数运行数组每一项。返回每次函数调用的结果组成的数组。
+       some(): 给定函数运行数组每一项。如果函数对任一项返回true, 则返回true.
+
+       缩小方法：reduce()和reduceRight(),迭代数组每一项，构建一个最终的返回值。IE9+
+                 reduce(): 从第一项开始，逐个遍历到最后一项
+                 reduceRight(): 从最后一项开始，逐个遍历到第一项
+                 两函数接收4个参数：前一个值、当前值、项的索引和数组对象；函数返回的任何值都会作为第一个参数自动传给下一项。第一次迭代发生在数组的第二项，因此第一个参数是数组第一项，第二个参数是数组第二项。
+                 var s = [1,2,3,4,5].reduce(function(prev, curr, index, array){
+                       return prev + curr;
+                 })
+
+                 //s = 15
+
+       类数组： 具有length属性的对象
+            var o = { length:2, 0:1, 1:2 }
+		    var a = Array.prototype.slice.call(o); // 或者 [].slice.call(o)
+		    console.log(a); // [1,2]
+
+    日期/时间组件方法
+        getTime(): 返回表示日期的毫秒数
+        setTime(): 以毫秒数设置日期
+
+        getFullYear(): 取得4位数的年份
+        setFullYear(): 设置日期的年份。传入的年份值必须4位数
+
+        getMonth(): 返回日期中的月份。0表示一月，11表示十二月
+        setMonth(): 设置月份，[0-11]表示今年的月份，小于0表示递减至去年的月份，大于11表示递增至明年的月份
+
+        getDate(): 返回月份中的天数(1-31)
+        setDate(): 设置月份中的天数，如果传入的值超过的当月应有的天数，则增加月份。
+
+        getDay():  返回日期中星期的星期几。0表示星期日，6表示星期六
+
+        getHours(): 返回日期中的小时数，0-23
+        setHours(): 设置日期中的小时数，传入值超过了23，则增加月份中的天数
+
+        getMinutes(): 返回日期中的分钟数，0-59
+        setMinutes(): 设置日期中的分钟数，传入值超过59，则增加小时数
+
+        getSeconds(): 返回日期中的秒数，0-59
+        setSeconds(): 设置日期中的秒数，传入值超过59，则增加分钟数
+
+        getMilliseconds(): 返回日期中的毫秒数
+        setMilliseconds(): 设置日期中的毫秒数
+
+    
+    正则表达式   
+        var expression = / pattern / flags;
+        var expression = new RegExp( 'pattern', 'flags');
+        flags匹配模式  
+            g: 表示全局(global)模式， 模式应用于所有字符串，而非在发现第一个匹配项时立即停止
+            i: 表示不区分大小写
+            m: 表示多行模式。即在达到一行末尾时会继续查找下一行是否存在与模式匹配的项
+
+        匹配以下字符时必须转义  {} () [] \ ^ $ | ? * + . 
+        exec(): 专门为捕获组设计的
+                var text = "cat, bat, sat";
+                var pattern = /.at/g;
+                var matchs = pattern.exec(text);
+                console.log(matchs.index) // 0
+                console.log(matchs[0])    // cat
+                console.log(pattern.lastIndex) // 3
+
+                matchs = pattern.exec(text);
+			    console.log(matchs.index) // 4
+			    console.log(matchs[0])    // bat
+			    console.log(pattern.lastIndex) // 7
+
+		test(): 接收一个字符串参数，在模式与参数匹配的情况下返回true，否则返回false
+
+		RegExp构造函数的属性:(opera不支持短名称)
+		    input         $_    最近一次要匹配的字符串
+		    lastMatch     $&    最近一次的匹配项
+		    lastParen     $+    最近一次匹配的捕获组
+		    leftContext   $`    input字符串中lastMatch之前的文本
+		    multiline     $*    是否所有表达式都使用多行模式
+		    rightContext  $'    input字符串中lastMatch之后的文本
+
+		    var text = "this is a short summer";
+		    var pattern = /(.)hort/g;
+		    if(pattern.test(text)){
+		    	console.log(RegExp.input || RegExp.$_);    //this is a short summer
+		    	console.log(RegExp.lastMatch || RegExp["$&"]); //short
+		    	console.log(RegExp.lastParen || RegExp["$+"]); //s
+		    	console.log(RegExp.leftContext || RegExp["$`"]); //this is a
+		    	console.log(RegExp.rightContext || RegExp["$'"]);// summer
+		    	console.log(pattern.multiline); //false
+		    }
+
+		    RegExp.$1,RegExp.$1,...,RegExp.$9: 用于存储第一、第二、...、第九个匹配的捕获组
+    
+    Function函数 
+        函数名仅仅是指向函数的指针，类似于对象。(使用不带圆括号的函数名是访问函数指针，而非调用函数)
+        function sum(a, b){ return a+b; }
+        解析器会优先读取函数声明，并使其在执行任何代码之前可用。
+
+        var sum = function(a,b){ return a+b;};
+        函数表达式，则必须等到解析器执行到它所在的代码行，才真正被解释执行
+
+        var sum = new Function("a","b","return a+b"); 不推荐此方式。这种语法会导致解析2次代码，第一次解析常规的js代码，第二次解析传入构造函数中的字符串，影响性能
+
+        每个函数都有2个方法 call()和apply(),都是在特定的作用域中调用函数，即设置函数体内this对象的值
+        接收2个参数，一个是在其中运行函数的作用域，另一个参数apply()是传递数组参数或arguments对象，call()则不是。
+            window.color = 'red';
+            var o = { color: 'bule' };
+            function getColor(){ return this.color; }
+            
+            getColor() // red
+            getColor.call(o); // blue
+
+        bind(): 创建一个函数的实例，其this值会被绑定到 传递给bind()里函数 的this; IE9+
+            var sayColor = getColor.bind(o);
+            sayColor(); // blue
+
+    闭包: 有权访问另一个函数作用域中的变量的函数
+          匿名函数的执行环境具有全局性，因此其this对象通常指向window
+
+    Number类型   
+       toFixed(num): 按照指定的小数位返回数值的字符串表示。保留小数位时会自动进行舍入操作。
+
+    String类型   
+        每个实例都有一个length属性，表示字符串包含多少个字符。
+        charAt(): 返回给定位置的字符的字符串表示
+        charCodeAt():返回给定位置的字符的字符编码
+        fromChatCode(): 接收一个或多个字符编码，返回一个字符串。charCodeAt()的反操作
+        concat(): 将一个或多个字符串拼接起来，返回拼接到的新字符串。 原字符串不变
+        slice(start,end): 返回[start,end）间的字符串。参数为负值时会将传入负值与长度相加。原字符串不变
+        substring(start,end): 返回[start,end）间的字符串。参数为负值时将参数转换为0。原字符串不变
+        substr(start,length): 返回始于start的长度为length的字符串。第一个参数为负值时会加上长度，第二个参数为负值时转换为0。原字符串不变
+        indexOf(str,start):从一个字符串中所有指定字符串，返回指定字符串位置，没找到返回-1。从前向后找
+        lastIndexOf(str,start): 同上述功能。从后向前找
+        trim(): 创建一个字符串副本，删除前置及后置所有空格，返回此副本。不改变原字符串。 IE9+
+        toLowerCase(): 转换成小写
+        toUpperCase(): 转换成大写
+
+        模式匹配方法
+        match(): 接收一个参数[正则表达式或者RegExp对象]
+            var text = "cat, bat, sat";
+            var pattern = /.at/;
+            var matches = text.match(pattern); //与 pattern.exec(text) 相同
+            console.log(matches.index)  // 0
+            console.log(matches[0]) // cat
+            console.log(matches.lastIndex) //0
+        search():与match接收一样的参数，返回字符串中第一个匹配的索引。没找到返回-1。从前向后查找
+
+        replace(RegExp对象或字符串, 字符串或函数): 如果第一个参数是字符串，只会替换第一个匹配字符串。要替换所有字符串，唯一办法是提供一个正则表达式，指定全局标识。
+            var result = text.replace("at", "ond");
+            console.log(result) // "cond, bat, sat"
+
+            result = text.replace(/at/g, "ond");
+            console.log(result) // "cond, bond, sond"
+
+            如果第二个参数是字符串，还可以使用一些特殊的字符序列
+            $&  匹配整个模式的子字符串。与RegExp.lastMatch值相同
+            $'  匹配子字符串之前的字符串。与RegExp.leftContext值相同
+            $`  匹配子字符串之后的字符串。与RegExp.rightContext值相同
+            $n  匹配第n个捕获组的子字符串。n为0-9, 没有匹配则返回空字符串
+            $nn 匹配第nn个捕获组的子字符串。nn为01-99, 没有匹配则返回空字符串
+
+            如果第二个参数是函数 模式匹配项 模式匹配项在字符串中位置 原始字符串
+            function htmlEscape(text){
+                 return text.replace(/[<>"&]/g, function(match, pos, originalText){
+                      switch(match){
+                          case "<": return "&lt;";
+                          case ">": return "&gt;";
+                          case "\"": return "&quot;";
+                          case "&": return "&amo;";
+                      }
+                 })
+            }
+
+        split(): 基于指定的分隔符将一个字符串分割成多个字符串，并将结果放在一个数组中。
+                 分隔符可以使字符串或RegExp对象。
+                 接收第二个参数，用于指定数组大小，确保返回的数组不会超过既定大小
+
+        localeCompare(): 比较2个字符串
+                 如果字符串在字母表中应该排在字符串参数之前，则返回-1
+                 如果字符串等于字符串参数，则返回0
+                 如果字符串在字母表中应该排在字符串参数之后，则返回1
+                 var str = 'black';
+                 console.log(str.localeCompare('abs')) // 1
+                 console.log(str.localeCompare('black')) // 0
+                 console.log(str.localeCompare('color')) // -1
+
+    单体内置对象  
+        如Object Array String 都是单体内置对象
+        URI编码方法
+            encodeURI(): 主要用于对整个URI编码。不会对本身属于URI的特殊字符编码，如冒号、正斜杠、问号、井号
+            decodeURI(): 对encodeURI()解码
+            URIComponent(): 主要用于对URI中的某一段编码。对他发现的任何非标准字符编码
+            decodeURIComponent(): 对URIComponent()解码
+
+        Math对象
+            Math.max(): 确定一组数据中的最大值。接收任意多个数值参数
+            Math.min(): 确定一组数据中的最小值。接收任意多个数值参数
+            这两个方法经常用于避免多余的循环和在if语句中确定一组数的最大值。
+            要找到数组中的最大值或最小值，可使用apply方法
+               var arr = [1,2,3,56,6,7,23];
+               var max = Math.max.apply(Math, arr); // 56
+
+            Math.ceil(): 向上舍入到最接近的整数
+            Math.floor(): 向下舍入到最接近的整数
+            Math.round(): 四舍五入到最接近的整数
+            Math.random(): 返回介于0和1之间的随机数，不包括0和1
+            Math.abs(): 返回一个数的绝对值
+
+    对象         
+        数据属性：有4个描述其行为的特性
+        Configurable: 表示能否通过delete删除属性从而重新定义属性，能否修改属性的特性。或者能否把属性修改为访问器属性
+        Enumerable: 表示能否通过for-in循环返回属性
+        Writeable: 表示能否修改属性的值
+        Value: 包含这个属性的数据值
+
+        要修改属性的默认属性，需使用
+        Object.defineProperty(属性所在对象， 属性名字， 描述符对象)
+            var person = {};
+            Object.defineProperty(person, name, {
+                 configurable: false,
+                 enumerable: true,
+                 writeable: false,
+                 value: 'no'
+            })
+
+        访问器属性：有4个特性
+        Configurable: 表示能否通过delete删除属性从而重新定义属性，能否修改属性的特性。或者能否把属性修改为访问器属性
+        Enumerable: 表示能否通过for-in循环返回属性
+        Get: 在读取属性时调用的函数
+        Set: 在写入属性时调用的函数
+            var book = {
+                _year: 2004,
+                edition: 1
+            }
+            Object.defineProperty(book, "year", {
+                get: function(){
+                    return this._year;
+                },
+                set: function(newVal){
+                    if(newVal != this._year){
+                       this._year = newVal;
+                       this.edition++;
+                    }
+                }
+            })
+            book.year = 2005;
+            console.log(book.edition); //2
+
+        Object.defineProperties(): 一次定义多个属性
+
+        读取属性的特性：Object.getOwnPropertyDescriptor(obj, propertyName)
+            console.log(Object.getOwnPropertyDescriptor(person, configurable)) // false
+
+        工厂模式：有对象识别的问题(即怎样知道一个对象的类型)
+            function createPerson(name, age){
+                 var o = new Object();
+                 o.name = name;
+                 o.age = age;
+                 o.say = function(){
+                     console.log(this.name);
+                 }
+                 return o;
+            }
+            var p1 = createPerson('kj',27);
+
+        构造函数模式: 重复代码冗余
+            function Person(name, age){
+                 this.name = name;
+                 this.age = age;
+                 this.say = function(){
+                     console.log(this.name);
+                 }
+            }
+            var p1 = new Person('kj',27);
+            要创建Person实例，必须使用new操作符，这种方式会经历以下4个步骤：
+            1.创建一个新对象
+            2.将构造函数的作用域赋给新对象(this指向新对象)
+            3.执行构造函数中的代码(为这个新对象添加属性)
+            4.返回新对象
+
+        原型模式: 缺点--原型模式下的引用类型数据(array),多个实例间会共享
+            每个函数都有一个prototype(原型)属性，它是一个指针，指向一个对象。这个对象包含可以由特定类型的所有实例共享的属性和方法
+            function Person(){}
+            Person.prototype.name = "jj";
+            Person.prototype.say = function(){}
+            var p1 = new Person();
+            var p2 = new Person();
+            console.log(p1.say == p2.say) // true
+
+            isPrototypeOf(): 判断一个对象是否是 参数对象的原型对象
+            Person.prototype.isPrototypeOf(p1) // true
+
+            Object.getPrototypeOf():取得一个对象的原型
+            Object.getPrototypeOf(p1) ==  Person.prototype  //true
+
+            当为对象实例添加一个属性时，这个属性会屏蔽原型对象中保存的同名属性。即这个属性会阻止访问原型中同名属性，但不会修改原型中同名属性。
+            使用delete操作符可完全删除实例中属性，从而能重新访问原型中同名属性。
+               p1.name = 'hh';
+               console.log(p1.name) // hh 来自实例
+               console.log(p2.name) // jj 来自原型
+               delete p1.name;
+               console.log(p1.name) // jj 来自原型
+
+            hasOwnProperty(): 检测一个属性是在实例中，还是原型中。在实例中返回true
+               p1.name = 'hh';
+               p1.hasOwnProperty('name') // true
+               p2.hasOwnProperty('name') // false
+
+            原型与in操作符
+               单独使用时，in操作符会在通过对象能够访问给定属性时返回true，无论该实例存在实例中还是原型中
+                   console.log("name" in p1) // true
+                   console.log("name" in p2) // true
+               for-in循环：返回所有能通过对象访问、可枚举的属性。包含实例中与原型中的
+               Object.keys(): 接收一个对象作为参数，返回一个包含所有可枚举属性的字符串数组
+                  var keys = Object.keys(Person.prototype) // ['name','say']
+               Object.getOwnPropertyNames(): 得到所有的实例属性，无论是否可枚举
+
+        组合使用构造函数模式和原型模式: 推荐用法
+            function Person(name, age){
+	           this.name = name;
+	           this.age = age;
+	           this.friends = ['a','b']
+            }
+
+            // 重写了构造函数的原型对象，需要显示的指回constructor
+            Person.prototype = {
+	           constructor: Person
+	           say: function(){
+	              console.log(this.name)
+	           }
+            }
+            var p1 = new Person('kj',27);
+
+        动态原型模式
+            function Person(name, age){
+	           this.name = name;
+	           this.age = age;
+	           if(typeof this.say != 'function'){
+	               Person.prototype.say = function(){
+	                  console.log(this.name);
+	               }
+	           }
+            }
+            var p1 = new Person('kj',27);
+
+        寄生构造函数模式
+            function Person(name, age){
+                 var o = new Object();
+                 o.name = name;
+                 o.age = age;
+                 o.say = function(){
+                     console.log(this.name);
+                 }
+                 return o;
+            }
+            var p1 = new Person('kj',27);
+
+            案例：
+            function SpecialArray(){
+	             var values = new Array();
+	             values.push.apply(values, arguments);
+	             values.toPiedString = function(){
+	                 return this.join('|')
+	             } 
+	             return values;   
+            }
+            var colors = new SpecialArray('r','g','b'); // ['r','g','b'],
+            colors.toPiedString(); // r|g|b
+
+        稳妥构造函数模式
+            function Person(name, age){
+               var o = new Object();
+               o.say = function(){
+                  console.log(name);
+               }
+               return o;
+            }
+            var p1 = new Person('kj',27);
+            p1.say();   //除了调用say()方法外，没其他方式可以访问数据成员。谓之稳妥
+
+        原型链继承: 每个构造函数都有一个原型对象，原型对象包含一个指向构造函数的指针。实例包含一个指向原型对象的内部指针。  
+            function Parent(){
+                this.p = 1;
+                this.c = ['r','g','b'];
+            }
+            Parent.prototype.getp = function(){ return this.p; }
+
+            function Child(){
+                this.c = 2;
+            }
+            Child.prototype = new Parent(); //继承Parent
+            Child.prototype.getc = function(){ return this.c; }
+
+            var c = new Child();
+            原型链继承存在的问题:
+                1.Parent里定义的引用类型属性，会存在于Child原型对象中。Child实例对象则会共享此属性。
+                2.创建Child实例时，无法在不影响所有对象实例时，向Parent传递参数。
+
+        借用构造函数: 可以向Parent传递参数
+            function Parent(){
+                this.c = ['r','g','b'];
+            }
+            function Child(){
+                Parent.call(this); //继承Parent
+            }
+            var c = new Child();
+            借用构造函数存在的问题:
+               1.函数需要在构造函数中定义，这样函数复用无从谈起
+               2.在Parent原型中定义的方法，在Child不可见，结果所有类型都只能使用构造函数模式
+
+        组合继承:使用原型链实现对原型属性和方法的继承；通过借用构造函数来实现对实例属性的继承.(最常用的继承模式)
+            function Parent(name){
+               this.name = name;
+               this.c = ['r','g','b'];
+            }
+            function Child(name, age){
+               Parent.call(this, name); //继承属性
+               this.age = age;
+            }
+            Child.prototype = new Parent(); //继承方法
+            Child.prototype.say = function(){ return this.name; }
+
+            var c = new Child('kj', 27);
+
+        原型式继承:
+            function object(o){ // 类似 Object.create()
+                function F(){}
+                F.prototype = o;
+                return new F();
+            }
+            var person = {
+                age: [23,24];
+            }
+            var p1 = object(person);
+            var p2 = object(person);
+
+        寄生式继承
+            function create(o){
+               var clone = object(o);
+               clone.say = function(){}
+               return clone;
+            }
+            var p1 = object(person);
+            var p2 = object(person);// 有自己独立的say方法
+
+        寄生组合式继承: 引用类型最理想的继承范式
+            function inheritPrototype(SubType, SuperType){
+                var prototype = object(SuperType.prototype);
+                prototype.constructor = SubType;
+                SubType.prototype = prototype;
+            }
+            function SuperType(name){
+                this.name = name;
+            }
+            SuperType.prototype.say = function(){ return this.name; }
+
+            function SubType(name, age){
+                SuperType.call(this, name);
+                this.age = age;
+            }
+            inheritPrototype(SubType, SuperType);
+            SubType.prototype.sayname = function(){ return this.name }
+
+    BOM     window对象
+            如果页面中包含框架，则每个框架都拥有自己的window对象，并且保存在frames集合中。
+            frames集合中可通过数值索引(从0开始，从左至右，从上至下)或者框架名称来访问相应的window对象
+
+            确定窗口尺寸
+            var pageWidth = window.innerWidth;
+            var pageHeight = window.innerHeight;
+            if(typeof pageWidth != 'number'){
+                if(document.compatMode == 'CSS1Compat'){ //判断浏览器是否处于标准模式
+                   pageWidth = document.documentElement.clientWidth;
+                   pageHeight = document.documentElement.clientHeight;
+                }else{
+                   pageWidth = document.body.clientWidth;
+                   pageHeight = document.body.clientHeight;
+                }
+            } 
+
+            超时调用 var tid = window.setTimeout(fn, time)  
+            取消超时调用 clearTimeout(tid) 
+            间歇调用 var cid = window.setInterval(fn, time)
+            取消间歇调用 clearInterval(cid) 
+            使用超时调用模拟间歇调用是一种最佳模式。原因是后一个间歇调用可能会在前一个间歇调用结束之前启动。超时调用可避免这一点。
+
+            location对象: 既是window对象的属性，也是document对象的属性。 window.location == document.location
+                 http://www.hao123.com:8080/index?a=1&b=2#c=3&d=4
+                 hash: 返回URL中的hash(#后跟零或多个字符)。无则返回空字符串.  #c=3&d=4
+                 host: 返回域名和端口号.  www.hao123.com:8080
+                 hostname: 返回不带端口号的域名.  www.hao123.com
+                 href: 返回当前页面的完整url. http://www.hao123.com:8080/index?a=1&b=2#c=3&d=4
+                 pathname: 返回URL中的目录和文件名。 /index
+                 port: 返回url中指定的端口号。无则返回空字符串。 8080
+                 protocol: 返回页面使用的协议。http:
+                 search: 返回URL的查询字符串，以问号开头。?a=1&b=2
+
+                 location.assign(url):立即打开新url并在浏览器历史记录中生成一条记录。
+                 location.href = url 或 window.location = url  也会调用location.assign()方法
+                 location.hash = hash
+                 location.search = search
+                 location.hostname = hostname
+                 location.pathname = pathname
+                 location.port = port
+                 每次修改location的属性(hash除外)，页面都会以新URL重新加载
+                 上述任一方式修改url，浏览器的历史记录会生成一条新纪录。通过单机“后退”可导航到前一个页面
+
+                 location.replace(url): 页面跳转到新url，但不会在浏览器历史记录中生成新纪录。
+                 location.reload(): 重新加载当前页面(有可能从缓存中加载)
+                 location.reload(true): 强制从服务器重新加载当前页面
+
+            navigator对象
+                plugins: 浏览器中安装插件信息的数组
+                userAgent: 浏览器的用户代理字符串
+
+            screen对象: 用处不大
+            history对象
+                history.go(num): 在历史记录中任意跳转。正数向前跳转，负数向后跳转
+                history.back(): 后退一页
+                history.forward(): 向前一页
+
+    DOM对象
+            element.appendChild()         向元素添加新的子节点，作为最后一个子节点
+            element.attributes            返回元素属性的 NamedNodeMap
+            element.childNodes            返回元素子节点的 NodeList
+            element.className             设置或返回元素的 class 属性
+            element.cloneNode(deep)       克隆元素。克隆所有后代，请把 deep 参数设置 true，否则设置为 false
+            element.firstChild            返回元素的首个子节点
+            element.getAttribute()        返回元素节点的指定属性值
+            element.getAttributeNode()    返回指定的属性节点
+            element.hasAttribute()        如果元素拥有指定属性，则返回true，否则返回 false
+            element.hasAttributes()       如果元素拥有属性，则返回 true，否则返回 false
+            element.hasChildNodes()       如果元素拥有子节点，则返回 true，否则 false
+            element.id                    设置或返回元素的 id
+            element.innerHTML             设置或返回元素的内容
+            element.insertBefore()        在指定的已有的子节点之前插入新节点
+            element.lastChild             返回元素的最后一个子元素
+            element.nextSibling           返回位于相同节点树层级的下一个节点
+            element.nodeName              返回元素的名称
+            element.nodeType              返回元素的节点类型
+            element.ownerDocument         返回元素的根元素（文档对象）
+            element.parentNode            返回元素的父节点
+            element.previousSibling       返回位于相同节点树层级的前一个元素
+            element.removeAttribute()     从元素中移除指定属性
+            element.removeAttributeNode() 移除指定的属性节点，并返回被移除的节点
+            element.removeChild()         从元素中移除子节点
+            element.replaceChild()        替换元素中的子节点
+            element.setAttribute()        把指定属性设置或更改为指定值
+            element.setAttributeNode()    设置或更改指定属性节点
+            element.tagName               返回元素的标签名
+            element.textContent           设置或返回节点及其后代的文本内容
+            element.title                 设置或返回元素的 title 属性
+            nodelist.item()               返回 NodeList 中位于指定下标的节点
+            nodelist.length               返回 NodeList 中的节点数
+               
+            document.querySelector(): 返回匹配选择器的第一个元素
+            document.querySelectorAll(): 返回匹配选择器的元素nodeList 
+
+            element.classList方法：IE10+
+                length: 返回元素名的数量
+                item(num): 根据元素类名的索引，返回对应的类名。
+                add(className): 添加类名，已存在则不添加
+                remove(className): 移除类名
+                toggle(classname): 有此类名则删除，无此类名则添加
+                contains(classname): 检测类名是否存在，有返回true，无返回false
+
+            偏移量
+                element.offsetHeight: 元素垂直方向占据的像素计高度。包含边框+内边距
+                element.offsetWidth: 元素水平方向占据的像素计宽度。包含边框+内边距
+                element.offsetLeft: 元素左外边框至包含元素(element.offsetParent)的左内边框之间的像素距离。
+                element.offsetTop:  元素上外边框至包含元素(element.offsetParent)的上内边框之间的像素距离。 
+
+                   function getElementPosition(element, direction){ // direction Left or Top
+                        var offsetPosition = element["offset" + direction];
+                        var offsetParent = element.offsetParent;
+                        while(offsetParent != null){
+                            offsetPosition += offsetParent["offset" + direction];
+                            offsetParent = offsetParent.offsetParent;
+                        }
+                        return offsetPosition;
+                   }
+
+                element.clientWidth: 元素宽度+内边距
+                element.clientHeight: 元素高度+内边距
+
+            滚动大小    
+                element.scrollTop: 滚动距离 
+                var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
+
+            getBoundingClientRect(): 返回一个对象，包含left,right,top,bottom; 表示元素各边与页面上边和左边的距离
+                element.getBoundingClientRect().left  元素左边到页面左边的距离
+
+            事件 
+            element.addEventListener(事件名，作为事件处理的函数，布尔值)
+            布尔值为true  表示在捕获阶段调用事件处理程序
+            布尔值为false 表示在冒泡阶段调用事件处理程序
+            element.removeEventListener(参数与定义事件时相同，如果事件处理函数为匿名函数，则无法移除事件)
+                var eventUtil = {
+                    addHandler: function(element, type, handler){
+                        if(element.addEventListener){ DOM2级事件处理
+                           element.addEventListener(type, handler, false);
+                        }else if(element.attachEvent){ IE事件处理
+                           element.attachEvent("on"+type, handler);
+                        }else { DOM0级事件处理
+                           element["on"+type] = handle;
+                        }
+                    },
+                    removeHandler: function(element, type, handler){
+                        if(element.removeEventListener){
+                           element.removeEventListener(type, handler, false);
+                        }else if(element.detachEvent){
+                           element.detachEvent("on"+type, handler);
+                        }else {
+                           element["on"+type] = null;
+                        }
+                    }
+                }
+
+            事件源event对象
+                bubbles            表示事件是否冒泡
+                cancelable         表示是否可以取消事件的默认行为
+                currentTarget      表示事件处理程序当前正在处理的那个元素
+                defaultPrevented   为true表示已经调用了preventDefault()
+                eventPhase         1:捕获阶段  2:处于目标  3:冒泡阶段
+                preventDefault()   取消事件默认行为，如果cancelable为true，则可以使用这个方法
+                stopImmediatePropagation() 取消事件的进一步捕获或冒泡，同时阻止任何事件处理程序被调用
+                stopPropagation()  取消事件的进一步捕获或冒泡, 如果bubbles为true，则可以使用这个方法
+                target             事件目标
+                type               被触发事件的类型
+                事件处理程序内部，this始终等于currentTarget的值
+
+            事件源event对象 IE
+                cancelBubble       默认false, 设置为true则取消事件冒泡
+                returnValue        默认true, 设置为false则取消事件默认行为
+                srcElement         事件目标 (与target相同)
+                type               被触发事件的类型
+                IE事件处理程序内部，this等于window
+*/ 
+    
+;(function(){
+
+    //取出数组中重复元素最多的元素
+    var demo = [1,4,4,6,6,6,4,1,1,1,1,6,6];
+    var arr = [];
+    var sum = [];
+    demo.forEach(function(v,k){
+        if(arr.indexOf(v) == -1){
+            arr.push(v);
+        }
+    })
+    arr.forEach(function(v, k){
+        var num = 0;
+        var code = demo.indexOf(v);
+        while(code > -1){
+             num++;
+             code = demo.indexOf(v, code+1);
+        }
+        sum.push(num);
+    })
+
+    var kx = {
+        v:0,
+        i: []
+    }
+    sum.forEach(function(v, k){
+        if(!kx.i[v]){
+            kx.i[v] = [];
+        }
+        if(v >= kx.v){
+            kx.v = v;
+            kx.i[v].push(k);
+        }
+    })
+    kx.i[kx.v].forEach(function(v, k){
+        console.log(arr[v]);
+    })
+
+})();
+
+//获取某一天的日期
+function getDate(dateNumber){ // -1：昨天   0：今天   1：明天
+	var date = new Date();
+	date.setDate(date.getDate() + dateNumber);
+	var year = date.getFullYear(),
+	    month = date.getMonth() + 1,
+	    day = date.getDate();
+	month = month < 10? '0'+month:month;
+	day = day < 10? '0'+day:day;
+	return year + '-' + month + '-' + day;
+}
+
+Object.prototype.s = 13;
+
+Function.prototype.f = 14;
+
+function A(){}
+A.prototype.a = 12;
+
+var c = new A();
+console.log(A.prototype == c.__proto__);
+console.log(c.__proto__.__proto__ == A.prototype.__proto__);
+console.log(A.prototype.__proto__ == Object.prototype)  
+console.log(Object.prototype.__proto__ == null)
+
+console.log(A.__proto__ == Function.prototype)
+console.log(Function.__proto__ == Function.prototype)
+console.log(Object.__proto__ == Function.prototype)
+console.log(Function.prototype.__proto__ == Object.prototype)
+
+console.log(c.constructor == A)
+console.log(A.constructor == Function)
+console.log(Object.constructor == Function)
+
+//取出数组的最大值
+var arr = [1,2,3,56,6,7,23];
+var max = Math.max.apply(Math, arr);
+console.log(max);
+
+//类数组转化成数组
+var o = { length:2, 0:1, 1:2 }
+var a = Array.prototype.slice.call(o);
+a = [].slice.call(o)
+console.log(a);
+
+//寄生构造案例
+function SpecialArray(){
+     var values = new Array();
+     values.push.apply(values, arguments);
+     values.toPiedString = function(){
+         return this.join('|')
+     } 
+     return values;   
+}
+var colors = new SpecialArray('r','g','b');
+console.log(colors.toPiedString());
+
+// 1 1 2 3 5 8 13 21
+function get(n){
+  var prev = 0;
+  var now = 1;
+  var sum = 0;
+  if(n < 2) return 1;
+  for(var i=1; i<n; i++){
+      sum = prev + now;
+      prev = now;
+      now = sum;
+  }
+  return sum;
+}
+console.log(get(7));
+
+function getQueryString(name){
+   var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", 'i');
+   var r = decodeURI(window.location.search).substring(1).match(reg);
+   if(r != null){
+      return decodeURI(r[2]);
+   }
+   return null;
+}
+console.log(getQueryString('a'))
+
+function getElementPosition(element, direction){ // direction Left or Top
+    var offsetPosition = element["offset" + direction];
+    var offsetParent = element.offsetParent;
+    while(offsetParent != null){
+        offsetPosition += offsetParent["offset" + direction];
+        offsetParent = offsetParent.offsetParent;
+    }
+    return offsetPosition;
+}
+console.log(getElementPosition(document.querySelector('body'), 'Top'))
+
+var eventUtil = {
+    addHandler: function(element, type, handler){
+        if(element.addEventListener){ DOM2级事件处理
+           element.addEventListener(type, handler, false);
+        }else if(element.attachEvent){ IE事件处理
+           element.attachEvent("on"+type, handler);
+        }else { DOM0级事件处理
+           element["on"+type] = handle;
+        }
+    },
+    removeHandler: function(element, type, handler){
+        if(element.removeEventListener){
+           element.removeEventListener(type, handler, false);
+        }else if(element.detachEvent){
+           element.detachEvent("on"+type, handler);
+        }else {
+           element["on"+type] = null;
+        }
+    },
+    getEvent: function(event){
+        return event || window.event;
+    },
+    getTarget: function(event){
+        return event.target || event.srcElement;
+    },
+    preventDefault: function(event){
+        if(event.preventDefault){
+           event.preventDefault();
+        }else{
+           event.returnValue = false;
+        }
+    },
+    stopPropagation: function(event){
+        if(event.stopPropagation){
+           event.stopPropagation();
+        }else{
+           event.cancelBubble = true;
+        }
+    }
+}
+
+console.log(Object.prototype.toString.call([]) == "[object Array]")
+
+
+var getQueryString = function (name) {
+    var reg = new RegExp("(^|&|#)" + name + "=([^&#]*)(&|#|$)", "i");
+    var loca = window.location.href.indexOf('?')>0? window.location.search+window.location.hash:window.location.hash;
+    var r = decodeURI(loca);
+    r = r.substr(1).match(reg);console.log(r);
+    if (r != null) return unescape(r[2]); return null;
+};
+// console.log(getQueryString('b'))
+
+</script>

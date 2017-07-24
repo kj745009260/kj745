@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>js实现排序算法</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <style type="text/css">
+        * {
+            box-sizing: border-box;
+        }
+        html {
+            height: 100%;
+        }
+        body {
+            height: 100%;
+        }
+        header {
+            padding-bottom: 5px;
+            border-bottom: 2px solid #ff0000;
+        }
+        .main {
+            display: flex;
+            min-height: 100%;
+        }
+        aside {
+            border-right: 1px solid #dfdfdf;
+            flex: 1;
+        }
+        ul > li {
+            margin-bottom: 10px;
+        }
+        li {
+            cursor: pointer;
+        }
+        ul > li:hover {
+            color: #9E8503;
+        }
+        .logInfo {
+            padding: 20px;
+            flex: 3;
+        }
+        .content {
+            padding: 20px;
+        }
+        .content > #info > div {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #dfdfdf;
+        }
+        #info > div:nth-of-type(2n) {
+            color: #037FB5;
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <aside>
+            <ul>
+                <li date-func="bubbleSort">冒泡排序</li>
+                <li date-func="selectSort">选择排序</li>
+                <li date-func="insertSort">插入排序</li>
+                <li date-func="shellSort">希尔排序</li>
+                <li date-func="sheelSort2">希尔排序2 - 动态步长</li>
+                <li date-func="qSort">快速排序</li>
+                <li date-func="heapSort">堆排序</li>
+                <li date-func="mergeSort">归并排序</li>
+            </ul>
+        </aside>
+        <div class="logInfo">
+            <header>
+                排序数列: [6, 0, 5, 12, -1, 20, 34, 7, 0, 1, 100, 20]
+            </header>
+            <div class="content">
+                <h3>排序信息：</h3>
+                <div id="info">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var arr = [6, 0, 5, 12, -1, 20, 34, 7, 0, 1, 100, 20];
+    var step = [5, 3, 1];
+    var ulEle = document.querySelector("ul");
+    var infoEle = document.getElementById("info");
+    function copy(b) {
+        var result = [];
+        for(var i in b) {
+            result[i] = b[i];
+        }
+        return result;
+    }
+    ulEle.addEventListener("click",function(event) {
+        var target = event.target;
+        if(target.nodeName === "LI") {
+            infoEle.innerHTML = "";
+            var func = target.getAttribute("date-func");
+            eval(func + "(copy(arr))");
+        }
+    }, false);
+
+    //希尔排序
+    function shellSort(arr) {
+        for(var s = 0; s < step.length; s++) {
+            for(var i = step[s]; i < arr.length; i++) {
+                for(var j = i - step[s]; j >= 0; j = j - step[s]) {
+                    if(arr[j] > arr[step[s] + j]) {
+                        var temp = arr[j];
+                        arr[j] = arr[step[s] + j];
+                        arr[step[s] + j] = temp
+                    }
+                }
+            }
+            callback(arr);
+        }
+    }
+    function callback(arr) {
+        if(arr.length === 0) {
+            return;
+        }
+        var divEle = document.createElement("div");
+        var node = document.createTextNode("排序结果  " + arr.toString());
+        divEle.appendChild(node);
+        infoEle.appendChild(divEle);
+    }
+
+    //希尔排序2 - 动态步长
+    function sheelSort2(arr) {
+        var N = arr.length;
+        var h = 1;
+        while(h < N / 3) {
+            h = 3 * h + 1;
+        }
+        while(h >= 1) {
+            for(var i = h; i < arr.length; i++) {
+                for(var j = i - h; j >= 0; j = j - h) {
+                    if(arr[j] > arr[h + j]) {
+                        var temp = arr[j];
+                        arr[j] = arr[h + j];
+                        arr[h + j] = temp
+                    }
+                }
+            }
+            callback(arr);
+            h = (h - 1) / 3
+        }
+    }
+
+    //快速排序
+    function qSort(arr) {
+        callback(arr);
+        if(arr.length === 0) {
+            return [];
+        }
+        var lesser = [];
+        var greater = [];
+        var pivot = arr[0];
+        for(var i = 1; i < arr.length; i++) {
+            if(arr[i] < pivot) {
+                lesser.push(arr[i]);
+            }else {
+                greater.push(arr[i]);
+            }
+        }
+        return qSort(lesser).concat(pivot, qSort(greater));
+    }
+
+    // 插入排序
+    function insertSort(arr) {
+        for(var i = 1; i < arr.length; i++) {
+            for(var j = 0; j < i; j++) {
+                if(arr[i] < arr[j]) {
+                    arr.splice(j, 0, arr[i]);
+                    arr.splice(i + 1, 1);
+                }
+            }
+            callback(arr);
+        }
+    }
+
+    //堆排序
+    function heapSort(arr) {
+        var len = arr.length;
+        buildMaxHeap();
+        for(var i = len - 1; i > 0; i--) {
+            swap(0, i);
+            heapAdjust(0, i);
+            callback(arr);
+        }
+        function buildMaxHeap() {
+            for(var i = Math.floor(len / 2) - 1; i >= 0; i--) {
+                heapAdjust(i, len);
+            }
+        }
+        //堆调整
+        function heapAdjust(i, j) {
+            //根节点和左右子节点下标
+            var largest = i;
+            var left = 2 * i + 1;
+            var right = 2 * i + 2;
+            if(left < j && arr[largest] < arr[left]) {
+                largest = left;
+            }
+            if(right < j && arr[largest] < arr[right]) {
+                largest = right;
+            }
+            if(largest !== i) {
+                swap(i, largest);
+                heapAdjust(largest, j);
+            }
+            callback(arr);
+        }
+        function swap(i, j) {
+            var temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+    }
+
+    //归并排序
+    function mergeSort(arr) {
+      if (arr.length < 2) {
+        return;
+      }
+      var step = 1;
+      var left, right;
+      while (step < arr.length) {
+        left = 0;
+        right = step;
+        while (right + step <= arr.length) {
+          mergeArrays(arr, left, left + step, right, right + step);
+          left = right + step;
+          right = left + step;
+        }
+        if (right < arr.length) {
+          mergeArrays(arr, left, left + step, right, arr.length);
+        }
+        step *= 2;
+      }
+      callback(arr);
+    }
+    function mergeArrays(arr, startLeft, stopLeft, startRight, stopRight) {
+      var rightArr = new Array(stopRight - startRight + 1);
+      var leftArr = new Array(stopLeft - startLeft + 1);
+      k = startRight;
+      for (var i = 0; i < (rightArr.length - 1); ++i) {
+        rightArr[i] = arr[k];
+        ++k;
+      }
+      k = startLeft;
+      for (var i = 0; i < (leftArr.length - 1); ++i) {
+        leftArr[i] = arr[k];
+        ++k;
+      }
+      rightArr[rightArr.length - 1] = Infinity; // 哨兵值
+      leftArr[leftArr.length - 1] = Infinity; // 哨兵值
+      var m = 0;
+      var n = 0;
+      for (var k = startLeft; k < stopRight; ++k) {
+        if (leftArr[m] <= rightArr[n]) {
+          arr[k] = leftArr[m];
+          m++;
+        }
+        else {
+          arr[k] = rightArr[n];
+          n++;
+        }
+      }
+      callback(leftArr.concat(rightArr))
+    }
+
+    //选择排序
+    function selectSort(arr) {
+        for(var i = 0; i < arr.length; i++) {
+            for(var j = i + 1; j < arr.length; j++) {
+                if(arr[i] > arr[j]) {
+                    var temp = arr[j];
+                    arr[j] = arr[i];
+                    arr[i] = temp;
+                }
+            }
+            callback(arr);
+        }
+    }
+
+    //冒泡排序
+    function bubbleSort(arr) {
+        var i = arr.length, j;
+        while (i > 0) {
+            for (j = 0; j < i - 1; j++) {
+                if (arr[j] > arr[j + 1]) {
+                    var temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                }
+            }
+            i--;
+            callback(arr);
+        }
+    }
+</script>
+</html>

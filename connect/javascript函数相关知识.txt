@@ -1,0 +1,62 @@
+   //三种定义函数的方式
+   //1.function语句。有名函数,优先解析,具有函数作用域
+   function a(){
+	   return 1;
+   }
+   //2.函数直接量方式。匿名函数,顺序解析,具有函数作用域
+   var a = function(){
+	   return 2;
+   }
+   //3.通过Function构造函数定义函。匿名函数,顺序解析,具有顶级作用域
+   var a = new Function('return 3');
+   
+   //参数问题
+   function b(e,f,d,g){
+	   //alert(arguments.callee.length); //返回函数形参的个数,arguments.callee代表函数本身
+	   //alert(b.length);                //返回函数形参的个数
+	   //alert(arguments.length);          //返回函数实参的个数
+   }
+   
+   //call和apply
+   function sum(n1,n2){ return n1+n2;}
+   function calls(c1,c2){
+	   return sum.call(this,c1,c2);
+   }
+   function applys(a1,a2){
+	   return sum.apply(this,[a1,a2]);
+   }
+   //:example
+   var color = 'red';
+   var obj = {color:'blue'};
+   function c(){
+	   alert(this.color);
+   }
+   //c.call(this);  //red
+   //c.call(obj);     //blue
+   
+   //call方法模拟
+   function s1(m1,m2){ return m1+m2;}
+   function Obj(o1,o2){
+	   this.o1 = o1;
+	   this.o2 = o2;
+	   return o1*o2;
+   }
+   var o = new Obj(10,20);
+   o.method = s1;
+   o.method(o.o1,o.o2);
+   delete o.method;
+   
+   //js中没有块级作用域概念
+   //js中模拟有块级作用域
+   function k(){
+	   (function(){
+		   for(var i=0;i<5;i++){
+		      alert(i)
+	       }
+	   })();//()表示执行
+	   alert(i); //i is not defined
+   }
+   
+   //闭包：一个函数可以访问另外一个函数作用域内的变量.
+   //具有封闭性：private 起到保护变量的作用
+   

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="format-detection" content="telephone=no" />
+<meta http-equiv="x-rim-auto-match" content="none">
+<title>越烧，越对味</title>
+<link href="css/ssn.css" rel="stylesheet">
+<script src="js/jquery.min.js"></script>
+<style type='text/css'>
+  .box { width: 100%; overflow: hidden; position: relative;}
+  ul { position: relative; }
+  li { list-style: none; position: absolute; top: 0; left: 0; display: block; -webkit-transition: all 300ms ease;}
+  .no-animation {transition:none; -webkit-transition:none;}
+  li img { display: block; width: 100%; }
+  .list { position: absolute; bottom: 10px; left: 0; width:100%; text-align: center; z-index: 15;}
+  .list span { display: inline-block; width: 8px; height: 8px; border-radius: 50%; border: 1px solid #fff; box-sizing: border-box; margin: 0 4px;}
+  .list span.active { background: #fff; }
+  .overlay { position: absolute; z-index: 999; top: 0; right: 0; bottom: 0; left: 0; display: none; }
+</style>
+</head>
+<body>
+   <header>
+     <div class="box">
+        <ul>
+          <li><img src="img/pic01.jpg"></li>
+          <li><img src="img/pic02.jpg"></li>
+          <li><img src="img/pic03.jpg"></li>
+          <li><img src="img/pic04.jpg"></li>
+          <li><img src="img/pic05.jpg"></li>
+        </ul>
+     </div>
+   </header>
+   <section>
+      <div class="limit-date">活动时间：x月x日-x月x日</div>
+      <div class="quanbox">
+         <div class="list">
+            <div class="contain-bg"><img src="img/red.png"/></div>  <!--<img src="img/gray.png"/> 背景置灰-->
+            <div class="content clearfix">
+                <div class="left"><strong>3</strong>元</div>
+                <div class="right">
+                  <p>仅限购买布朗旎烧酸奶可用</p>
+                  <p id="receive-one">每日限领取1张</p>
+                </div>
+            </div>
+         </div>
+         <div class="list">
+            <div class="contain-bg"><img src="img/orange.png"/></div>
+            <div class="content clearfix">
+                <div class="left"><strong>5</strong>折</div>
+                <div class="right">
+                  <p>仅限购买布朗旎烧酸奶可用</p>
+                  <p id="receive-two">每周限领取1张</p>
+                </div>
+            </div>
+         </div>
+      </div>
+   </section>
+   <footer>
+      <a href="#"><img src="img/tip.png"/>点击查看附近的售货机</a>
+   </footer>
+
+   <div class="container1" style="display: none;">
+      <div class="container_bg"></div>
+      <div class="container_content">
+          <div class="close"><img src="img/close.png"/></div>
+          <div class="con">
+              <p>恭喜您获得</p>
+              <p>布朗旎<strong>3元</strong>代金券一张</p>
+          </div>
+          <div class="piaobox"><img src="img/goodpic.png"/></div>
+          <a href="">扫码使用</a>
+          <div class="info">
+             <p>优惠券有效期：x天</p>
+             <p>使用微信扫描布朗旎商品二维码时</p>
+             <p>自动使用此优惠</p>
+             <p>查看优惠券:进入友宝微信公众号-我的-优惠券</p>
+          </div>
+          <div class="contbg"><img src="img/quan_bg.png"></div>
+      </div>
+   </div>
+
+   <div class="container2" style="display: none;">
+      <div class="container_bg"></div>
+      <div class="container_content">
+          <div class="close"><img src="img/close.png"/></div>
+          <div class="con">
+              <p>恭喜您获得</p>
+              <p>布朗旎<strong>5折</strong>代金券一张</p>
+          </div>
+          <div class="piaobox"><img src="img/goodpic.png"/></div>
+          <a href="">扫码使用</a>
+          <div class="info">
+             <p>优惠券有效期：x天</p>
+             <p>使用微信扫描布朗旎商品二维码时</p>
+             <p>自动使用此优惠</p>
+             <p>查看优惠券:进入友宝微信公众号-我的-优惠券</p>
+          </div>
+          <div class="contbg"><img src="img/quan_bg.png"></div>
+      </div>
+   </div>
+</body>
+<script src='js/index.js'></script>
+<script>
+  $('.box').banner({
+     'imgW':486,
+     'imgH':300
+  });
+</script>
+<script>
+(function(){
+   document.getElementById('receive-one').onclick = function(e){
+       if(document.body.scrollTop > 0){
+         changeContain(document.body.scrollTop);
+       }
+       document.getElementsByClassName('container1')[0].style.display = 'block';
+       preventScroll();
+   }
+
+   document.getElementById('receive-two').onclick = function(){
+       document.getElementsByClassName('container2')[0].style.display = 'block';
+       preventScroll();
+   }
+
+   var closeArr = document.getElementsByClassName('close');
+   for(var i=0; i<closeArr.length; i++){
+      closeArr[i].index = i;
+      closeArr[i].onclick = function(){
+         document.getElementsByClassName('container'+(this.index+1))[0].style.display = 'none';
+         changeContain(0);
+         stopPreventScroll();
+      }
+   }
+
+   function changeContain(num){
+       var containerBg = document.getElementsByClassName('container_bg');
+       var containerCon = document.getElementsByClassName('container_content')
+       for(var i=0;i<containerBg.length; i++){
+           containerCon[i].style.top = (num*1.5)+'px';
+           containerBg[i].style.bottom = (-num)+'px';
+       }
+   }
+
+   function preventScroll(){
+       document.getElementsByTagName('html')[0].style.overflow = 'hidden';
+       document.getElementsByTagName('html')[0].style.height = '100%';
+       document.getElementsByTagName('body')[0].style.overflow = 'hidden';
+       document.getElementsByTagName('body')[0].style.height = '100%';
+   }
+
+   function stopPreventScroll(){
+       document.getElementsByTagName('html')[0].style.overflow = 'auto';
+       document.getElementsByTagName('html')[0].style.height = 'auto';
+       document.getElementsByTagName('body')[0].style.overflow = 'auto';
+       document.getElementsByTagName('body')[0].style.height = 'auto';
+   }
+})()
+</script>
+</html>

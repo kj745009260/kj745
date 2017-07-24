@@ -1,0 +1,102 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>canvas</title>
+<style type="text/css">
+* { margin:0; padding:0;}
+.can { border:dashed 2px #CCC; margin:5px; float:left;}
+</style>
+<script>
+  function $(id){
+	  return document.getElementById(id);
+  }
+  function $$(className){
+	  return document.getElementsByClassName(className);
+  }
+  window.onload = function(){
+	  var can1 = $('can1').getContext('2d');
+	  can1.moveTo(0,0); //第一个起点
+	  can1.lineTo(90,120);//第二个点
+	  can1.lineTo(190,50);//第三个点，以第二个点为起点
+	  can1.lineWidth = 3; //线条的宽度
+	  can1.strokeStyle = 'red';//笔触的颜色
+	  can1.stroke();//绘制路径
+	  
+	  var can2 = $('can2').getContext('2d');
+	  can2.moveTo(0,0);
+	  can2.lineTo(200,150);
+	  var can2_r = can2.createLinearGradient(0,0,200,150);//定义线性渐变对象
+	  can2_r.addColorStop(0,'red');//定义渐变的开始位置和颜色
+	  can2_r.addColorStop(1,'yellow');//定义渐变的结束位置和颜色
+	  can2.lineWidth = 3;
+	  can2.strokeStyle = can2_r;
+	  can2.stroke();
+	  
+	  var can3 = $('can3').getContext('2d');
+	  can3.fillStyle = 'yellow'; //填充颜色
+	  can3.fillRect(20,20,160,110);//绘制已填充的矩形(左上角x坐标，左上角y坐标，矩形宽度，矩形高度)
+	  
+	  var can4 = $('can4').getContext('2d');
+	  can4.strokeStyle = 'red';
+	  can4.strokeRect(20,20,160,110);//绘制矩形，无填充
+	  
+	  var can5 = $('can5').getContext('2d');
+	  var can5_r = can5.createLinearGradient(10,0,190,0);
+	  can5_r.addColorStop(0,'red');
+	  can5_r.addColorStop(0.5,'green');
+	  can5_r.addColorStop(1,'blue');
+	  can5.fillStyle = can5_r;
+	  can5.fillRect(20,20,160,110);
+	  
+	  var can6_ = $$('can6');
+	  for(var i=0;i<can6_.length;i++){
+		  var can6 = can6_[i].getContext('2d');
+		  can6.beginPath();//开始一条路径，或重置当前的路径
+		  if(i==0){
+		  can6.arc(100,75,60,0,Math.PI*2,true);//创建弧/曲线（用于创建圆或部分圆）(圆心x坐标，圆心y坐标，圆半径，起始角，结束角，顺逆时针【true逆时针,false顺时针】)
+		  }
+		  if(i==1) can6.arc(100,75,60,0,Math.PI,true);
+		  if(i==2) can6.arc(100,75,60,0,Math.PI,false);
+		  if(i==3) can6.arc(100,75,60,0,Math.PI/2,true);
+		  if(i==4) can6.arc(100,75,60,0,Math.PI/2,false);
+		  can6.closePath();
+		  can6.fillStyle = 'green';
+		  can6.fill();
+	  }
+	  
+	  var can7 = $('can7').getContext('2d');
+	  can7.beginPath();
+	  can7.arc(100,75,60,0,Math.PI*2,false);
+	  can7.closePath();
+	  can7.lineWidth = 5;
+	  can7.strokeStyle='red';
+	  can7.stroke();
+	  
+	  var can8 = $('can8').getContext('2d');
+	  can8.beginPath();
+	  can8.arc(100,75,60,0,Math.PI*2,true);
+	  can8.closePath();
+	  var can8_r = can8.createRadialGradient(100,80,0,100,50,150);
+	  can8_r.addColorStop(0,'red');
+	  can8_r.addColorStop(1,'#333');
+	  can8.fillStyle = can8_r;
+	  can8.fill();  
+  }
+</script>
+</head>
+<body>
+  <canvas id="can1" class="can" width="200" height="150"></canvas>
+  <canvas id="can2" class="can" width="200" height="150"></canvas>
+  <canvas id="can3" class="can" width="200" height="150"></canvas>
+  <canvas id="can4" class="can" width="200" height="150"></canvas>
+  <canvas id="can5" class="can" width="200" height="150"></canvas>
+  <canvas class="can6 can" width="200" height="150"></canvas>
+  <canvas class="can6 can" width="200" height="150"></canvas>
+  <canvas class="can6 can" width="200" height="150"></canvas>
+  <canvas class="can6 can" width="200" height="150"></canvas>
+  <canvas class="can6 can" width="200" height="150"></canvas>
+  <canvas id="can7" class="can" width="200" height="150"></canvas>
+  <canvas id="can8" class="can" width="200" height="150"></canvas>
+</body>
+</html>

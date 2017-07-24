@@ -1,0 +1,15 @@
+function isImgLoad(src,callback){ //[图片的src属性，回调函数]
+    var img = new Image();
+    if(!!window.ActiveXObject){
+  	img.onreadystatechange = function(){
+	     if(this.readyState == 'complete'){
+	  	 callback();
+	     }
+         }
+    }else{
+  	img.onload = function(){
+  	     callback();
+  	}
+    }
+    img.src = src;
+}
