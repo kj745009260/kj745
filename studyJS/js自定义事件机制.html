@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	
+</body>
+</html>
+<script>
+
+function Event(){}
+
+Event.prototype.addListener = function(type, listener){
+    if(!this.hasOwnProperty("_listener")){
+    	this._listener = [];
+    }
+
+    if(typeof this._listener[type] == 'undefined'){
+    	this._listener[type] = [];
+    }
+
+    this._listener[type].push(listener);
+}
+
+Event.prototype.fire = function(type, event){
+	if(!event.target){
+		event.target = this;
+	}
+
+	if(this._listener && this._listener[type] instanceof Array){
+		var listeners = this._listener[type];
+		for(var i=0; i<listeners.length; i++){
+			listeners[i].call(this, event);
+		}
+	}
+}
+
+Event.prototype.removeListener = function(type, listener){
+	if(this._listener && this._listener[type] instanceof Array){
+		var listeners = this._listener[type];
+		for(var i=0; i<listeners.length; i++){
+			if(listeners[i] === listener){
+				listeners.splice(i, 1);
+				break;
+			}
+		}
+	}
+}
+
+var showms = function(event){
+    console.log('message is ' + event.data);
+}
+
+var target = new Event();
+target.addListener('message', showms)
+
+setTimeout(function(){
+	target.fire('message', {
+		data: 'hello world'
+	})
+	target.removeListener('message', showms);
+}, 3000);
+
+setTimeout(function(){
+	target.fire('message', {
+		data: 'hello world'
+	})
+}, 6000);
+
+
+</script>
