@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	
+</body>
+</html>
+<script>
+	//promise  模拟两个异步请求，一个异步请求需要取得另一个异步请求返回的数据
+	var createRandom = (function(){
+        var max = 10;
+        var random = 0
+        return function(){
+            var ran = Math.ceil(Math.random()*max);
+            while(Math.abs(ran - random) <3){
+                ran = Math.ceil(Math.random()*max);
+            }
+            random = ran;
+            return ran;
+        }
+    })();
+    var a = null;
+    function change(success, fail){
+        var r = createRandom()*1000;
+        console.log(r);
+        setTimeout(function(){
+            a = 'success';
+            success();
+        }, r)
+    }
+
+    function changenext(success, fail){
+        var r = createRandom()*1000;
+        console.log(r); 
+        setTimeout(function(){
+            success(a);
+        }, r)
+    }
+
+    var createPromise = (function(){
+        return function(fn){
+            if(typeof fn === 'function'){
+               return new Promise(function(resolve, reject){
+                   fn(resolve, reject);
+               });
+            }
+        }
+    })();
+
+    var promisenext = createPromise(changenext);
+    
+    // createPromise(change).then(function(){
+    //     promisenext.then(function(){
+    //        console.log(a);
+    //     })
+    // }).catch(function(err){})
+
+    createPromise(change).then(() => {
+    	return promisenext;
+    }).then((d) => {
+    	console.log(d);
+    }).catch((err) => {
+    	console.log(err);
+    })
+
+    async function f(){
+    	await Promise.reject('出错了').catch(err => console.log(err));
+    	return await Promise.resolve('hello world');
+    }
+    f().then(res => console.log(res));
+</script>

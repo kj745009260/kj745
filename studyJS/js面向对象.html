@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>object</title>
+</head>
+<body>
+	<div id="aaa">2121222222</div>
+</body>
+</html>
+<script>
+    var timeArray = {
+        qiyue: [9.9, 9.5, 10.3, 9.6, 9.7, 9.7, 9.8, 12.1, 9.8, 9.8, 12, 9.6, 12.1, 9.7, 10.1, 10, 10.2, 12.9, 12, 9.7, 9.9],
+        bayue: [10.8,10.6,11.1,12.2,10.1,9.6,9.8,9.6,9.5,10.3,10.2,12.1,10.1,9.6,9.8,10.3,9.6,9.6,9.7,9.8,9.7],
+        jiuyue: []
+    }
+    var total = 0;
+    var arrayTotal = timeArray.qiyue.concat(timeArray.bayue, timeArray.jiuyue);
+    for(var i=0; i<arrayTotal.length; i++){
+        total += arrayTotal[i];
+    }
+    console.log(total-arrayTotal.length*10)
+    console.log(total/arrayTotal.length);
+
+    /* 继承对象 */
+    Object.create = Object.create || function(obj){
+        var F = function(){};
+        F.prototype = obj;
+        return new F();
+    }
+
+    /* 封装document.getElementById */
+    document.getElementById = (function(func){
+       return function(){
+           return func.apply(document, arguments);
+       }
+    })( document.getElementById );
+
+    var gid = document.getElementById;
+
+    /* 实现bind方法 */
+    Function.prototype.bind = function(){
+        var _this = this,
+            context = [].shift.call(arguments),
+            args = [].slice.call(arguments); 
+
+        return function(){
+            return _this.apply(context, [].concat.call(args, [].slice.call(arguments)));
+        }
+    }
+
+    var a = {};
+    Array.prototype.push.call(a, 'eee');
+
+    var c = Array.prototype.slice.call(a);
+
+    /* 变量数据类型 */
+    var Type = {
+        isTypeName: ['String', 'Array', 'Number', 'Boolean', 'Null']
+    };
+    for(var ele = 0, type; type = Type.isTypeName[ele++];){
+        (function(tp){
+            Type['is' + tp] = function(obj){
+                return Object.prototype.toString.call(obj) === '[object '+ tp + ']';
+            }
+        })(type);
+    }
+    console.log(Type.isNull(null));
+
+    var mult = (function(){
+        var cache = {};
+        var calculate = function(){
+            var a = 1;
+            for(var i=0, len = arguments.length; i<len; i++){
+                a *= arguments[i];
+            }
+            return a;
+        }
+        return function(){
+            var args = Array.prototype.join.call(arguments, ',');
+            if(args in cache){
+                return cache[args];
+            }
+            return cache[args] = calculate.apply(null, arguments);
+        }
+    })();
+    
+
+    Function.prototype.uncurrying = function(){
+        var me = this;
+        return function(){
+            var obj = Array.prototype.shift.call(arguments);
+            return me.apply(obj, arguments);
+        }
+    }
+
+    var push = Array.prototype.forEach.uncurrying();
+    (function(){
+        push(arguments, function(i, n){
+            //console.log(i);
+        });
+        
+    })(1,2,3);
+
+
+    var throttle = function(fn, interval){
+        var _self = fn,
+            timer,
+            firstTime = true;
+        return function(){console.log(8888);
+            var args = arguments,
+            me = this;
+
+            if(firstTime){
+                _self.apply(me, args);
+                return firstTime = false;
+            }
+
+            if(timer){
+                return false;
+            }
+
+            timer = setTimeout(function(){
+                clearTimeout(timer);
+                timer = null;
+                _self.apply(me, args);
+            }, interval || 500);
+        }
+    }
+
+    var tttt = throttle(function(){
+        console.log(11);
+    }, 10000);
+
+    //单例模式
+    var getSingle = function(fn){
+        var result;
+        return function(){
+            return result || (result = fn.apply(this, arguments));
+        }
+    }
+
+    //继承
+    function extend(Child, Parent){
+        var F = function(){};
+        F.prototype = Parent.prototype;
+        Child.prototype = new F();
+        Child.prototype.constructor = Child;
+        Child.uber = Parent.prototype; //在子对象上打开一条通道，可以直接调用父对象的方法
+    }
+
+    //快速排序
+    function quickSort(arr){
+        if(arr.length <=1){
+           return arr;
+        }
+        var pivotIndex = Math.floor(arr.length/2);
+        var pivot = arr.splice(pivotIndex, 1)[0];
+        var left = [], right = [];
+        for(var i=0; i<arr.length; i++){
+            if(arr[i] < pivot){
+               left.push(arr[i]);
+            }else{
+               right.push(arr[i]);
+            }
+        }
+        return arguments.callee(left).concat([pivot], arguments.callee(right));
+    }
+
+    //代理模式
+    var myImage = (function(){
+        var jsNode = document.createElement('script');
+        document.body.appendChild(jsNode);
+        jsNode.onload = function(){
+            console.log($);
+        }
+        return {
+            setSrc: function(src){
+                jsNode.src = src;
+            }
+        }
+    })();
+
+    myImage.setSrc('http://m.elongstatic.com/activeonline/12/doubleege/js/jquery.min.js');
+
+    var each = function(array, callback){
+        for(var i=0, len=array.length; i < len; i++){
+            if(callback.call(this, i, array[i])){
+                break;
+            }
+        }
+    }
+
+    //观察者模式
+    var Event = (function(){
+        var global = this,
+            Event,
+            _default = 'default';
+
+        Event = (function(){
+            var _listen,
+                _trigger,
+                _remove,
+                _slice = Array.prototype.slice,
+                _shift = Array.prototype.shift,
+                _unshift = Array.prototype.unshift,
+                namespaceCache = {},
+                _create,
+                find,
+                each = function(array, fn){
+                    var ret;
+                    for(var i=0, l=array.length; i<l; i++){
+                        var n = array[i];
+                        ret = fn.call(n, i, n);
+                    }
+                    return ret;
+                };
+
+                _listen = function(key, fn, cache){
+                    if(!cache[key]){
+                        cache[key] = [];
+                    }
+                    cache[key].push(fn);
+                }
+
+                _remove = function(key, cache, fn){
+                    if(cache[key]){
+                        if(fn){
+                            for(var i = cache[key].length; i>=0; i--){
+                                if(cache[key][i] === fn){
+                                   cache[key].splice(i, 1);
+                                }
+                            }
+                        }else{
+                            cache[key] = [];
+                        }
+                    }
+                }
+
+                _trigger = function(){
+                    var cache = _shift.call(arguments),
+                        key = _shift.call(arguments),
+                        args = arguments,
+                        _self = this,
+                        ret,
+                        stack = cache[key];
+
+                    if(!stack || !stack.length){
+                        return;
+                    }
+                    return each(stack, function(){
+                        return this.apply(_self, args);
+                    })
+                }
+
+                _create = function(namespace){
+                    namespace = namespace || _default;
+                    var cache = {},
+                        offlineStack = [];
+                    var ret = {
+                            listen: function(key, fn, last){
+                                _listen(key, fn, cache);
+                                if(offlineStack === null){
+                                    return;
+                                }
+                                if(last === 'last'){
+                                   offlineStack.length && offlineStack.pop()();
+                                }else{
+                                   each(offlineStack, function(){
+                                       this();
+                                   }) 
+                                }
+
+                                offlineStack = null;
+                            },
+                            one: function(key, fn, last){
+                                _remove(key, cache);
+                                this.listen(key, fn, last);
+                            },
+                            remove: function(key, fn){
+                                _remove(key, cache, fn);
+                            },
+                            trigger: function(){
+                                var fn,
+                                    args,
+                                    _self = this;
+
+                                    _unshift.call(arguments, cache);
+                                    args = arguments;
+                                    fn = function(){
+                                        return _trigger.apply(_self, args);
+                                    }
+                                    if(offlineStack){
+                                        return offlineStack.push(fn);
+                                    }
+                                    return fn();
+                            }
+                        };
+                        return namespace? (namespaceCache[namespace]? namespaceCache[namespace]: namespaceCache[namespace] = ret) : ret;
+                }
+
+                return {
+                    create: _create,
+                    one: function(key, fn, last){
+                        this.create().one(key, fn, last);
+                    },
+                    remove: function(key, fn){
+                        this.create().remove(key, fn);
+                    },
+                    listen: function(key, fn, last){
+                        this.create().listen(key, fn, last);
+                    },
+                    trigger: function(){
+                        this.create().trigger.apply(this, arguments);
+                    }
+                }
+        })();
+
+        return Event;
+    })();
+
+
+    //中介者模式
+
+    function Player(name, teamColor){
+        this.state = 'live';
+        this.name = name;
+        this.teamColor = teamColor;
+    }
+
+    Player.prototype.win = function(){
+        console.log('winner: ' + this.name);
+    }
+    Player.prototype.lose = function(){
+        console.log('loser: ' + this.name);
+    }
+    Player.prototype.die = function(){
+        this.state = 'dead';
+        playerDirector.ReceiveMessage('playerDead', this);
+    }
+    Player.prototype.remove = function(){
+        playerDirector.ReceiveMessage('removePlayer', this);
+    }
+    Player.prototype.changeTeam = function(teamColor){
+        playerDirector.ReceiveMessage('changeTeam', this, teamColor);
+    }
+
+    var playerFactory = function(name, teamColor){
+        var newPlayer = new Player(name, teamColor);
+        playerDirector.ReceiveMessage('addPlayer', newPlayer);
+        return newPlayer;
+    }
+
+    var playerDirector = (function(){
+        var players = {},
+            operations = {};
+
+        operations.addPlayer = function(player){
+            var teamColor = player.teamColor;
+            players[teamColor] = players[teamColor] || [];
+            players[teamColor].push(player);
+        }
+        operations.removePlayer = function(player){
+            var teamColor = player.teamColor,
+                teamPlayers = players[teamColor] || [];
+            for(var i= teamPlayers.length - 1; i>=0; i--){
+                if(teamPlayers[i] === player){
+                   teamPlayers.splice(i, 1);
+                   break;
+                }
+            }
+        }
+        operations.changeTeam = function(player, newTeamColor){
+            operations.removePlayer(player);
+            player.teamColor = newTeamColor;
+            operations.addPlayer(player);
+        }
+        operations.playerDead = function(player){
+            var teamColor = player.teamColor,
+                teamPlayers = players[teamColor];
+
+            var all_dead = true;
+            for(var i=0, player; player = teamPlayers[i++];){
+                if(player.state !== 'dead'){
+                    all_dead = false;
+                    break;
+                }
+            }
+
+            if(all_dead){
+                for(var i=0, player; player = teamPlayers[i++];){
+                    player.lose();
+                }
+
+                for(var color in players){
+                    if(color !== teamColor){
+                        var teamPlayers = players[color];
+                        for(var i=0, player; player = teamPlayers[i++];){
+                            player.win();
+                        }
+                    }
+                }
+            }
+        }
+        var ReceiveMessage = function(){
+            var message = Array.prototype.shift.call(arguments);
+            operations[message].apply(this, arguments);
+        }
+        return {
+            ReceiveMessage:ReceiveMessage
+        }
+    })()
+
+    var p1 = playerFactory('aaa', 'red'),
+        p2 = playerFactory('bbb', 'red'),
+        p3 = playerFactory('ccc', 'red1'),
+        p4 = playerFactory('ddd', 'red1'),
+
+        p5 = playerFactory('eee', 'blue'),
+        p6 = playerFactory('fff', 'blue2'),
+        p7 = playerFactory('ggg', 'blue2'),
+        p8 = playerFactory('hhh', 'blue');
+
+        p1.die();
+        p2.die();
+        p3.die();
+        p4.die();
+
+
+    function checkInt(num){
+        return ((num - 0) | 0) === num - 0;
+    }
+
+    console.log((3.1-0) | 0);
+
+    var before = function(fn, beforefn){
+        return function(){
+            beforefn.apply(this, arguments);
+            return fn.apply(this, arguments);
+        }
+    }
+
+    var after = function(fn, afterfn){
+        return function(){
+            var ret = fn.apply(this, arguments);
+            afterfn.apply(this, arguments);
+            return ret;
+        }
+    }
+
+    var a = before(function(){
+        console.log(3);
+    }, function(){
+        console.log(2);
+    })
+
+    a = after(a, function(){ 
+        console.log(1);
+    })
+
+    console.log(a());
+
+
+
+
+
+
+    
+
+    
+
+    
+</script>
